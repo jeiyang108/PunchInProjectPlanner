@@ -1,0 +1,91 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="/templates/userDashTemplate.xhtml">
+	<ui:define name="navbar">
+		<div class="navbar">
+			<h:graphicImage class="logotext" library="images" name="logo_text.png"/>
+			<h:form>
+				<h:commandLink styleClass="navleft" style="color: #76C2C1;" action="/sections/employee/workPackages" value="#{msgs.navDashboard}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/employees" rendered="#{loginBean.currEmp.admin or loginBean.currEmp.basicInfo.credentials.role eq 'HR'}" value="#{msgs.employeeManagement}"/>
+				<h:commandLink styleClass="navleft" rendered="#{loginBean.isProjectManager()}" action="/sections/manager/projects?faces-redirect=true"  value="#{msgs.projects}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/reports" rendered="#{loginBean.currEmp.admin or loginBean.projectManager}" value="#{msgs.reports}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/timesheets"  rendered="#{loginBean.currEmp.timesheetApprover}" value="#{msgs.timesheets}"/>
+				<h:commandLink styleClass="navright" action="#{loginBean.logout}" value="#{msgs.navLogout}"/>
+			</h:form>
+		</div>
+	</ui:define>
+	<ui:define name="sidebar">
+		<div id="empprofile">
+			<h:graphicImage id="emppic" library="images" name="employee.jpg" />
+			<br />
+			<h:outputText id="empname" value="#{loginBean.username}" />
+			<br />
+			<h:outputText id="emptitle" value="Employee" />
+		</div>
+		<h:form>
+			<div class="button1">
+				<h:commandLink styleClass="buttonlink1" action="/sections/employee/workPackages" value="#{msgs.sideWP}" />
+			</div>
+			<div class="button1">
+				<h:commandLink styleClass="buttonlink1" action="/sections/employee/timesheets" value="#{msgs.sideTimesheets}" />
+			</div>
+			<div class="button1">
+				<h:commandLink styleClass="buttonlink1" action="/sections/employee/projects"	value="#{msgs.sideProjects}" />
+			</div>
+			<div class="button1" style="display:#{(loginBean.isResponsibleEngineer())?'block':'none'}">
+				<h:commandLink styleClass="buttonlink1" style="background-color: #569D99;" actionListener="#{uiDriver.reset}" action="/sections/employee/estimates" value="#{msgs.estimate}" />
+			</div>
+			<div class="button1"/>
+		</h:form>
+	</ui:define>
+		<ui:define name="content">
+			<div style="text-align: center; margin: 15px;">
+				<h:outputText styleClass="contentheading" value="#{msgs.estimateAdd}"/>
+			</div>
+			<div style="margin: 10px; width: 98%; height: 1px; background-color: #586465"/>
+			<h:form>
+				<div class="contentleft" style="border: none; margin: 15px 0 25px 15px;">
+					<p:panelGrid columns="2">
+						#{msgs.DS}: 		
+						<p:inputText style="width: 100%;" value="#{estimateDriver.estimateToAdd.DSPersonDays}" />
+  
+						#{msgs.P1}
+       					<p:inputText style="width: 100%;" value="#{estimateDriver.estimateToAdd.p1PersonDays}" />
+       		
+						#{msgs.P3}
+       					<p:inputText style="width: 100%;" value="#{estimateDriver.estimateToAdd.p3PersonDays}" />
+       					
+						#{msgs.P5}
+        					<p:inputText style="width: 100%;" value="#{estimateDriver.estimateToAdd.p5PersonDays}" />
+					</p:panelGrid>
+				</div>
+				<div class="contentright" style="margin: 15px 15px 25px 0;">
+					<p:panelGrid columns="2">
+						#{msgs.JS}
+       					<p:inputText style="width: 100%;" value="#{estimateDriver.estimateToAdd.JSPersonDays}" />
+       					
+       					#{msgs.P2}
+       					<p:inputText style="width: 100%;" value="#{estimateDriver.estimateToAdd.p2PersonDays}" />
+       					
+       					#{msgs.P4}
+       					<p:inputText style="width: 100%;" value="#{estimateDriver.estimateToAdd.p4PersonDays}" />
+       					
+       					#{msgs.P6}
+       					<p:inputText style="width: 100%;" value="#{estimateDriver.estimateToAdd.p6PersonDays}" />
+					</p:panelGrid>
+				</div>
+				<div style="margin: 20px 10px 0 10px; width: 98%; height: 1px; background-color: #586465; clear: both;"/>
+				<p:commandLink id="save" class="button3" action="#{estimateDriver.saveEstimate()}">
+					<h:graphicImage class="buttonlink3" style="background-color: #F2997D; margin-right: 0;" library="images" name="save_icon.png"/>
+				</p:commandLink>
+				<p:tooltip id="savetip" for="save" value="#{msgs.save}" trackMouse="true"/>
+				<p:commandLink id="delete" class="button3" action="estimate_details" immediate="true">
+					<h:graphicImage class="buttonlink3" style="background-color: #76C2C1;" library="images" name="delete_icon.png"/>
+				</p:commandLink>
+				<p:tooltip id="deletetip" for="delete" value="#{msgs.delete}" trackMouse="true"/>
+			</h:form>
+		</ui:define>
+	</ui:composition>

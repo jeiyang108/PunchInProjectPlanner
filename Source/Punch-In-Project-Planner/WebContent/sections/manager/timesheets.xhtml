@@ -1,0 +1,79 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="/templates/managerTemplate.xhtml">
+	<ui:define name="navbar">
+		<div class="navbar">
+			<h:graphicImage class="logotext" library="images" name="logo_text.png"/>
+			<h:form>
+				<h:commandLink styleClass="navleft" action="/sections/employee/workPackages" value="#{msgs.navDashboard}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/employees" rendered="#{loginBean.currEmp.admin or loginBean.currEmp.basicInfo.credentials.role eq 'HR'}" value="#{msgs.employeeManagement}"/>
+				<h:commandLink styleClass="navleft" rendered="#{loginBean.isProjectManager()}" action="/sections/manager/projects?faces-redirect=true"  value="#{msgs.projects}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/reports" rendered="#{loginBean.currEmp.admin or loginBean.projectManager or loginBean.projectManager}" value="#{msgs.reports}"/>
+				<h:commandLink styleClass="navleft" style="color: #76C2C1;"  rendered="#{loginBean.currEmp.timesheetApprover}" action="/sections/manager/timesheets" value="#{msgs.timesheets}"/>
+				<h:commandLink styleClass="navright" action="#{loginBean.logout}" value="#{msgs.navLogout}"/>
+			</h:form>
+		</div>
+	</ui:define>
+	<ui:define name="contentfull">
+		<h:form>
+			<div id="summarytitle" style="width: 98%; color: #76C2C1; margin: 10px; padding-bottom: 10px; border-bottom: 1px solid #5A6364;">
+				#{msgs.timesheetApproval}
+			</div>
+			<div id="timesheet">
+				<p:dataTable headerClass="projectheader" footerClass="projectfooter" 
+					value="#{timesheetDriver.getTimesheetsForApprover(loginBean.employeeId)}" var="timesheet"
+					widgetVar="projectTable" id="projectTable"
+					rows="10" filteredValue="#{projectDriver.filteredProjects}"
+                		paginator="true"
+                		paginatorPosition="bottom"
+                		paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+					<p:column filterBy="#{timesheet.employee.credentials.userName}" filterMatchMode="contains">
+						<f:facet name="header">#{msgs.userName}</f:facet>
+						<div style="text-align: center">
+							<h:outputText value="#{timesheet.employee.credentials.userName}" />
+						</div>
+					</p:column>
+					<p:column filterBy="#{uiDriver.displayName(timesheet.employee)}">
+						<f:facet name="header">#{msgs.name}</f:facet>
+						<div style="text-align: center">
+							<h:outputText value="#{uiDriver.displayName(timesheet.employee)}" />
+						</div>
+					</p:column>
+					<p:column filterBy="#{timesheet.endWeek}" filterMatchMode="contains">
+						<f:facet name="header">#{msgs.timesheetWeekEnd}</f:facet>
+						<div style="text-align: center">
+							<h:outputText value="#{timesheet.endWeek}" />
+						</div>
+					</p:column>
+					<p:column>
+						<f:facet name="header">#{msgs.timesheetTotal}</f:facet>
+						<div style="text-align: center">
+							<h:outputText value="#{timesheet.totalHours}"/>
+						</div>
+					</p:column>
+					<p:column>
+						<f:facet name="header">#{msgs.timesheetFlextime}</f:facet>
+						<div style="text-align: center">
+							<h:outputText value="#{timesheet.flextime}"/>
+						</div>
+					</p:column>
+					<p:column>
+						<f:facet name="header">#{msgs.timesheetOvertime}</f:facet>
+						<div style="text-align: center">
+							<h:outputText value="#{timesheet.overtime}"/>
+						</div>
+					</p:column>
+					<p:column style="text-align: center;">
+						<p:commandLink id="view" class="button3" action="#{timesheetDriver.viewTimesheet(timesheet)}">
+							<h:graphicImage class="buttonlink3" style="background-color: #F2997D; margin: 3px;" library="images" name="view_icon.png"/>
+						</p:commandLink>
+						<p:tooltip id="viewtip" for="view" value="#{msgs.view}" trackMouse="true"/>
+					</p:column>
+				</p:dataTable>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

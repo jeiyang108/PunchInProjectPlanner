@@ -1,0 +1,99 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="/templates/managerTemplate.xhtml">
+	<ui:define name="navbar">
+		<div class="navbar">
+			<h:graphicImage class="logotext" library="images"
+				name="logo_text.png" />
+			<h:form>
+				<h:commandLink styleClass="navleft" action="/sections/employee/workPackages" value="#{msgs.navDashboard}"/>
+				<h:commandLink styleClass="navleft" style="color: #76C2C1;" action="/sections/manager/employees" rendered="#{loginBean.currEmp.admin or loginBean.currEmp.basicInfo.credentials.role eq 'HR'}" value="#{msgs.employeeManagement}"/>
+				<h:commandLink styleClass="navleft" rendered="#{loginBean.isProjectManager()}" action="/sections/manager/projects?faces-redirect=true"  value="#{msgs.projects}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/reports" rendered="#{loginBean.currEmp.admin or loginBean.projectManager}" value="#{msgs.reports}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/timesheets"  rendered="#{loginBean.currEmp.timesheetApprover}" value="#{msgs.timesheets}"/>
+				<h:commandLink styleClass="navright" action="#{loginBean.logout}" value="#{msgs.navLogout}"/>
+			</h:form>
+		</div>
+	</ui:define>
+		<ui:define name="contentfull">
+			<h:form id="employees">
+			<div id="summarytitle" style="width: 98%; color: #76C2C1; margin: 10px; padding-bottom: 10px; border-bottom: 1px solid #5A6364;">
+				#{msgs.employeesTitle}
+			</div>
+				<div id="employee">
+					<p:dataTable headerClass="employeeheader" footerClass="employeefooter" 
+						value="#{hrManagementDriver.getEmployees()}" var="emp"
+						id="employeeTable" rows="8" 
+						sortBy="#{emp.basicInfo.lastName}"
+						paginator="true"
+                		paginatorPosition="bottom"
+                		paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+						>
+						<p:column filterBy="#{emp.basicInfo.credentials.userName}" filterMatchMode="contains">
+							<f:facet name="header">#{msgs.userName}</f:facet>
+							<div style="text-align: center;">
+								<h:outputText value="#{emp.basicInfo.credentials.userName}" />
+							</div>
+						</p:column>
+						<p:column filterBy="#{emp.basicInfo.firstName} #{emp.basicInfo.lastName}" filterMatchMode="contains">
+							<f:facet name="header">#{msgs.name}</f:facet>
+							<div style="text-align: center;">
+								<h:outputText value="#{emp.basicInfo.firstName}  #{emp.basicInfo.lastName}" />
+							</div>
+						</p:column>
+						<p:column filterBy="#{emp.basicInfo.supervisor.firstName} #{emp.basicInfo.supervisor.lastName}" filterMatchMode="contains">
+							<f:facet name="header">Supervisor</f:facet>
+							<div style="text-align: center;">
+								<h:outputText value="#{emp.basicInfo.supervisor.firstName} #{emp.basicInfo.supervisor.lastName}"/>
+							</div>
+						</p:column>
+						<p:column filterBy="#{emp.basicInfo.timesheetApprover.firstName} #{emp.basicInfo.timesheetApprover.lastName}" filterMatchMode="contains">
+							<f:facet name="header">#{msgs.timesheetApprover}</f:facet>
+							<div style="text-align: center;">
+								<h:outputText value="#{emp.basicInfo.timesheetApprover.firstName} #{emp.basicInfo.timesheetApprover.lastName}"/>
+							</div>
+						</p:column>
+    						<p:column style="width:80px;text-align: center">
+							<p:commandLink id="view" class="button3" action="#{hrManagementDriver.viewEmployee(emp)}">
+								<h:graphicImage class="buttonlink3" style="background-color: #F2997D; margin: 3px;" library="images" name="view_icon.png"/>
+							</p:commandLink>
+							<p:tooltip id="viewtip" for="view" value="#{msgs.view}" trackMouse="true"/>
+						</p:column>
+						<!-- 
+						<p:column>
+							<f:facet name="header">#{msgs.sickLeaves}</f:facet>
+							<h:outputText value="#{emp.basicInfo.sickLeaves}" />
+						</p:column>
+						 <p:column>
+							<f:facet name="header">#{msgs.labourGrade}</f:facet>
+							<h:outputText value="#{emp.basicInfo.labourGrade}" />
+						</p:column>
+						 
+					
+						 <p:column>
+							<f:facet name="header">#{msgs.vacation}</f:facet>
+							<h:outputText value="#{emp.basicInfo.vacation}" />
+						</p:column>
+						
+						<p:column>
+							<f:facet name="header">#{msgs.promotionDate}</f:facet>
+							<h:outputText value="#{emp.basicInfo.promotionDate}" />
+						</p:column>
+						 	 
+    					<p:column>
+							<f:facet name="header">#{msgs.flexTime}</f:facet>
+							<h:outputText value="#{emp.basicInfo.flexTime}" />
+						</p:column>	
+						-->
+				</p:dataTable>
+			</div>
+			<p:commandLink id="add" class="button3" update="employees" action="#{hrManagementDriver.addEmployee()}">
+				<h:graphicImage class="buttonlink3" style="height: 18px; width: 18px; padding: 7px; margin-top: -35px; margin-right: 0;" library="images" name="add_icon.png"/>
+			</p:commandLink>
+			<p:tooltip id="addtip" for="add" value="#{msgs.add}" trackMouse="true"/>
+		</h:form>
+	</ui:define>
+</ui:composition>

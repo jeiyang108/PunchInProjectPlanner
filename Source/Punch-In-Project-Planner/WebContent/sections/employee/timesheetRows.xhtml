@@ -1,0 +1,278 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="/templates/userDashTemplate.xhtml">
+	<ui:define name="navbar">
+		<div class="navbar">
+			<h:graphicImage class="logotext" library="images" name="logo_text.png"/>
+			<h:form>
+				<h:commandLink styleClass="navleft" style="color: #76C2C1;" action="/sections/employee/workPackages" value="#{msgs.navDashboard}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/employees" rendered="#{loginBean.currEmp.admin or loginBean.currEmp.basicInfo.credentials.role eq 'HR'}" value="#{msgs.employeeManagement}"/>
+				<h:commandLink styleClass="navleft" rendered="#{loginBean.isProjectManager()}" action="/sections/manager/projects?faces-redirect=true"  value="#{msgs.projects}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/reports" rendered="#{loginBean.currEmp.admin or loginBean.projectManager}" value="#{msgs.reports}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/timesheets"  rendered="#{loginBean.currEmp.timesheetApprover}" value="#{msgs.timesheets}"/>
+				<h:commandLink styleClass="navright" action="#{loginBean.logout}" value="#{msgs.navLogout}"/>
+			</h:form>
+		</div>
+	</ui:define>
+	<ui:define name="sidebar">
+		<div id="empprofile">
+			<h:graphicImage id="emppic" library="images" name="employee.jpg" />
+			<br />
+			<h:outputText id="empname" value="#{loginBean.username}" />
+			<br />
+			<h:outputText id="emptitle" value="Employee" />
+		</div>
+		<h:form>
+			<div class="button1">
+				<h:commandLink styleClass="buttonlink1" action="/sections/employee/workPackages" value="#{msgs.sideWP}" />
+			</div>
+			<div class="button1">
+				<h:commandLink styleClass="buttonlink1" style="background-color: #569D99;" action="/sections/employee/timesheets" value="#{msgs.sideTimesheets}" />
+			</div>
+			<div class="button1">
+				<h:commandLink styleClass="buttonlink1" action="/sections/employee/projects"	value="#{msgs.sideProjects}" />
+			</div>
+			<div class="button1" style="display:#{(loginBean.isResponsibleEngineer())?'block':'none'}">
+				<h:commandLink styleClass="buttonlink1" rendered="#{loginBean.isResponsibleEngineer()}" actionListener="#{uiDriver.reset}" action="/sections/employee/estimates" value="#{msgs.estimate}" />
+			</div>
+			<div class="button1"/>
+		</h:form>
+	</ui:define>
+		<ui:define name="content">
+			<div style="text-align: center; margin: 15px;">
+				<h:outputText styleClass="contentheading" value="#{msgs.timesheets}"/>
+			</div>
+			<div style="margin: 0 10px; width: 98%; height: 1px; background-color: #586465"/>
+			<div style="margin: 0; height: 89%; overflow: auto;">
+			<h:form>	
+				<div id="timesheetheading">
+					<div class="timesheetheadingleft">
+						<h:outputText styleClass="timesheetheading" value="#{msgs.timesheetEmpNum}"/>
+						<h:outputText styleClass="timesheetheadingcontent" value="#{loginBean.currEmp.basicInfo.employeeID}"/>
+						<br/>
+						<h:outputText styleClass="timesheetheading" value="#{msgs.timesheetEmpName}"/>
+						<h:outputText styleClass="timesheetheadingcontent" value="#{loginBean.currEmp.credential.userName}"/>
+					</div>
+					<div class="timesheetheadingmiddle">
+						<h:outputText styleClass="timesheetheading" value="#{msgs.timesheetWeekNum}"/>
+						<h:outputText styleClass="timesheetheadingcontent" value="#{timesheetDriver.ts.weekNumber}"/>
+					</div>
+					<div class="timesheetheadingright">
+						<h:outputText styleClass="timesheetheading" value="#{msgs.timesheetWeekEnd}"/>
+						<h:outputText styleClass="timesheetheadingcontent" value="#{timesheetDriver.ts.endWeek}"/>
+					</div>
+				</div>
+				<div id="timesheet">
+					<h:dataTable headerClass="timesheetheader"
+						value="#{timesheetDriver.ts.entries}"
+						var="row">
+							 <h:column>
+								<f:facet name="header">
+									#{msgs.projectNum}
+								</f:facet>
+								<h:selectOneMenu id="projectMenu" styleClass="medcol #{uiDriver.getDisabledClass(timesheetDriver.readOnly)}" 
+								disabled="#{timesheetDriver.readOnly}"
+								style="margin-left: 10px; height: 38px;" 
+								value="#{row.workPackage.id.projectNum}">
+									<f:ajax listener="#{row.selectProject}"/>					
+    									<f:selectItem itemValue="#{null}" itemLabel="-select-" />
+									<f:selectItems value="#{timesheetDriver.getAllProjects(loginBean.employeeId)}"
+										var="proj" itemValue="#{proj.projectNum}" itemLabel="#{proj.projectName}"/>
+									<f:validator validatorId="NotNull"/>
+									<f:attribute name="msg" value="#{msgs.projectNumEmptyError}" />
+								</h:selectOneMenu>
+								<f:facet name="footer">
+									<div style="margin: 10px 0;">
+										<h:outputText styleClass="timesheetfooter" value="#{msgs.timesheetTotal}"/>
+									</div>
+									<div style="margin-bottom: 10px;">
+										<h:outputText styleClass="timesheetfooter" value="#{msgs.timesheetOvertime}"/>
+									</div>
+									<div style="margin-bottom: 10px;">
+										<h:outputText styleClass="timesheetfooter" value="#{msgs.timesheetFlextime}"/>
+									</div>
+								</f:facet>
+							</h:column>
+							<h:column>
+								<f:facet name="header">
+									#{msgs.timesheetWP}
+								</f:facet>
+								
+								<h:selectOneMenu  styleClass="medcol #{uiDriver.getDisabledClass(timesheetDriver.readOnly)}"  
+								disabled="#{timesheetDriver.readOnly}"
+								style="margin-left: 10px; height: 38px;" value="#{row.workPackage.id.workpackageID}"
+								rendered="true">
+    								<f:selectItem itemValue="#{null}" itemLabel="-select-" />
+									<f:selectItems value="#{timesheetDriver.getWorkpackagesForProject(row.workPackage.id.projectNum)}"
+										var="wp" itemValue="#{wp.id.workpackageID}" itemLabel="#{wp.id.workpackageID}"/> 
+									<f:validator validatorId="NotNull"/>
+									<f:attribute name="msg" value="#{msgs.timesheetWPEmptyError}" />
+								</h:selectOneMenu>
+								<f:facet name="footer">
+									<div style="margin: 10px; text-align: right;">
+										<h:outputText styleClass="timesheetfooter" value="#{timesheetDriver.ts.totalHours}"/>
+									</div>
+									<div style="margin: 10px; text-align: right;">
+										<h:outputText styleClass="timesheetfooter" value="0"/>
+									</div>
+									<div style="margin: 10px; text-align: right;">
+										<h:outputText styleClass="timesheetfooter" value="0"/>
+									</div>
+								</f:facet>
+							</h:column>
+							<h:column>
+								<f:facet name="header">
+									#{msgs.timesheetSun}
+								</f:facet>
+								<p:inputText styleClass="smcol #{uiDriver.getDisabledClass(timesheetDriver.readOnly)}" readonly="#{timesheetDriver.readOnly}" value="#{row.getDayOfWeek(1).hoursWorked}">
+									<f:validator validatorId="MinVal" />
+									<f:attribute name="msg" value="#{msgs.timesheetSunError}" />
+									<f:attribute name="lowerBound" value="0" />
+									<f:attribute name="upperBound" value="24" />
+								</p:inputText>
+								<f:facet name="footer">
+									<div style="margin: -38px 10px; text-align: right;">
+										<h:outputText styleClass="timesheetfooter" value="#{timesheetDriver.ts.getTotalHoursByWeekday(1)}"/>
+									</div>
+								</f:facet>
+							</h:column>							
+							<h:column>
+								<f:facet name="header">
+									#{msgs.timesheetMon}
+								</f:facet>
+								<p:inputText styleClass="smcol #{uiDriver.getDisabledClass(timesheetDriver.readOnly)}" readonly="#{timesheetDriver.readOnly}" value="#{row.getDayOfWeek(2).hoursWorked}">
+									<f:validator validatorId="MinVal" />
+									<f:attribute name="msg" value="#{msgs.timesheetMonError}" />
+									<f:attribute name="lowerBound" value="0" />
+									<f:attribute name="upperBound" value="24" />
+								</p:inputText>
+								<f:facet name="footer">
+									<div style="margin: -38px 10px; text-align: right;">
+										<h:outputText styleClass="timesheetfooter" value="#{timesheetDriver.ts.getTotalHoursByWeekday(2)}"/>
+									</div>
+								</f:facet>
+							</h:column>							
+							<h:column>
+								<f:facet name="header">
+									#{msgs.timesheetTue}
+								</f:facet>
+								<p:inputText styleClass="smcol #{uiDriver.getDisabledClass(timesheetDriver.readOnly)}" readonly="#{timesheetDriver.readOnly}" value="#{row.getDayOfWeek(3).hoursWorked}">
+									<f:validator validatorId="MinVal" />
+									<f:attribute name="msg" value="#{msgs.timesheetTueError}" />
+									<f:attribute name="lowerBound" value="0" />
+									<f:attribute name="upperBound" value="24" />
+								</p:inputText>
+								<f:facet name="footer">
+									<div style="margin: -38px 10px; text-align: right;">
+										<h:outputText styleClass="timesheetfooter" value="#{timesheetDriver.ts.getTotalHoursByWeekday(3)}"/>
+									</div>
+								</f:facet>
+							</h:column>							
+							<h:column>
+								<f:facet name="header">
+									#{msgs.timesheetWed}
+								</f:facet>
+								<p:inputText styleClass="smcol #{uiDriver.getDisabledClass(timesheetDriver.readOnly)}" readonly="#{timesheetDriver.readOnly}" value="#{row.getDayOfWeek(4).hoursWorked}">
+									<f:validator validatorId="MinVal" />
+									<f:attribute name="msg" value="#{msgs.timesheetWedError}" />
+									<f:attribute name="lowerBound" value="0" />
+									<f:attribute name="upperBound" value="24" />
+								</p:inputText>
+								<f:facet name="footer">
+									<div style="margin: -38px 10px; text-align: right;">
+										<h:outputText styleClass="timesheetfooter" value="#{timesheetDriver.ts.getTotalHoursByWeekday(4)}"/>
+									</div>
+								</f:facet>
+							</h:column>							
+							<h:column>
+								<f:facet name="header">
+									#{msgs.timesheetThu}
+								</f:facet>
+								<p:inputText styleClass="smcol #{uiDriver.getDisabledClass(timesheetDriver.readOnly)}" readonly="#{timesheetDriver.readOnly}" value="#{row.getDayOfWeek(5).hoursWorked}">
+									<f:validator validatorId="MinVal" />
+									<f:attribute name="msg" value="#{msgs.timesheetThuError}" />
+									<f:attribute name="lowerBound" value="0" />
+									<f:attribute name="upperBound" value="24" />
+								</p:inputText>
+								<f:facet name="footer">
+									<div style="margin: -38px 10px; text-align: right;">
+										<h:outputText styleClass="timesheetfooter" value="#{timesheetDriver.ts.getTotalHoursByWeekday(5)}"/>
+									</div>
+								</f:facet>
+							</h:column>							
+							<h:column>
+								<f:facet name="header">
+									#{msgs.timesheetFri}
+								</f:facet>
+								<p:inputText styleClass="smcol #{uiDriver.getDisabledClass(timesheetDriver.readOnly)}" readonly="#{timesheetDriver.readOnly}" value="#{row.getDayOfWeek(6).hoursWorked}">
+									<f:validator validatorId="MinVal" />
+									<f:attribute name="msg" value="#{msgs.timesheetFriError}" />
+									<f:attribute name="lowerBound" value="0" />
+									<f:attribute name="upperBound" value="24" />
+								</p:inputText>
+								<f:facet name="footer">
+									<div style="margin: -38px 10px; text-align: right;">
+										<h:outputText styleClass="timesheetfooter" value="#{timesheetDriver.ts.getTotalHoursByWeekday(6)}"/>
+									</div>
+								</f:facet>
+							</h:column>
+							<h:column>
+								<f:facet name="header">
+									#{msgs.timesheetSat}
+								</f:facet>
+								<p:inputText styleClass="smcol #{uiDriver.getDisabledClass(timesheetDriver.readOnly)}" readonly="#{timesheetDriver.readOnly}" value="#{row.getDayOfWeek(7).hoursWorked}">
+									<f:validator validatorId="MinVal" />
+									<f:attribute name="msg" value="#{msgs.timesheetSatError}" />
+									<f:attribute name="lowerBound" value="0" />
+									<f:attribute name="upperBound" value="24" />
+								</p:inputText>
+								<f:facet name="footer">
+									<div style="margin: -38px 10px; text-align: right;">
+										<h:outputText styleClass="timesheetfooter" value="#{timesheetDriver.ts.getTotalHoursByWeekday(7)}"/>
+									</div>
+								</f:facet>
+							</h:column>							
+							<h:column>
+								<f:facet name="header">
+									#{msgs.timesheetNotes}
+								</f:facet>
+								<p:inputText styleClass="lgcol #{uiDriver.getDisabledClass(timesheetDriver.readOnly)}" readonly="#{timesheetDriver.readOnly}" value="#{row.notes}"/>								
+							</h:column>							
+							<h:column>
+								<h:commandLink id="delete" class="button3" rendered="#{!timesheetDriver.readOnly}" action="#{timesheetDriver.deleteTimesheetRow(row)}" immediate="true">
+									<h:graphicImage class="buttonlink3" style="background-color: #5DC4C2; margin: 0 10px 0 5px;" library="images" name="delete_icon.png"/>
+								</h:commandLink>
+								<p:tooltip id="deletetip" for="delete" value="#{msgs.delete}" trackMouse="true"/>
+							</h:column>
+					</h:dataTable>
+				</div>
+  	 			<h:outputLabel rendered="#{timesheetDriver.showApprovalNotes()}" >#{msgs.approverNotes}</h:outputLabel>
+				<h:outputText rendered="#{timesheetDriver.showApprovalNotes()}" value="#{timesheetDriver.ts.approvalNotes}"/>
+				<br/>
+				<div style="margin: 10px; width: 98%; height: 1px; background-color: #586465"/>
+				<h:commandLink id="back" class="button3" action="timesheets" immediate="true">
+					<h:graphicImage class="buttonlink3" style="background-color: #76C2C1; margin: 5px 0 5px 15px;" library="images" name="back_icon.png"/>
+				</h:commandLink>
+				<p:tooltip id="backtip" for="back" value="#{msgs.back}" trackMouse="true"/>
+				<h:commandLink id="add" class="button3" rendered="#{!timesheetDriver.readOnly}" action="#{timesheetDriver.addTimesheetRow()}" immediate="true">
+					<h:graphicImage class="buttonlink3" style="height: 18px; width: 18px; padding: 7px; margin: 5px 0 5px 15px;" library="images" name="add_icon.png"/>
+				</h:commandLink>
+				<p:tooltip id="addtip" for="add" value="#{msgs.add}" trackMouse="true"/>
+				<h:commandLink id="save" class="button3" rendered="#{!timesheetDriver.readOnly}" action="#{timesheetDriver.saveTimesheet}">
+					<h:graphicImage class="buttonlink3" style="background-color: #F2997D; margin: 5px 0 5px 15px;" library="images" name="save_icon.png"/>
+				</h:commandLink>
+				<p:tooltip id="savetip" for="save" value="#{msgs.save}" trackMouse="true"/>
+				<h:commandLink id="send" class="button3" rendered="#{!timesheetDriver.readOnly}" action="#{timesheetDriver.sendTimesheetForApproval}">
+					<h:graphicImage class="buttonlink3" style="background-color: #5A6364; margin: 5px 0 5px 15px;" library="images" name="sent_white_icon.png"/>
+				</h:commandLink>
+				<p:tooltip id="sendtip" for="send" value="#{msgs.send}" trackMouse="true"/>
+				<p:dialog header="Errors" widgetVar="errorStatus" modal="true" height="125" width="250" visible="#{facesContext.validationFailed}">
+    					<h:messages />
+				</p:dialog> 
+			</h:form>
+			</div>
+		</ui:define>
+	</ui:composition>

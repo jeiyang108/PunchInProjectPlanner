@@ -1,0 +1,254 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="/templates/managerTemplate.xhtml">
+	<ui:define name="navbar">
+		<div class="navbar">
+			<h:graphicImage class="logotext" library="images"
+				name="logo_text.png" />
+			<h:form>
+				<h:commandLink styleClass="navleft" action="/sections/employee/workPackages" value="#{msgs.navDashboard}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/employees" rendered="#{loginBean.currEmp.admin or loginBean.currEmp.basicInfo.credentials.role eq 'HR'}" value="#{msgs.employeeManagement}"/>
+				<h:commandLink styleClass="navleft" style="color: #76C2C1;" action="/sections/manager/projects" rendered="#{loginBean.currEmp.admin}" value="#{msgs.projects}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/reports" rendered="#{loginBean.currEmp.admin or loginBean.projectManager}" value="#{msgs.reports}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/timesheets"  rendered="#{loginBean.currEmp.timesheetApprover}" value="#{msgs.timesheets}"/>
+				<h:commandLink styleClass="navright" action="#{loginBean.logout}" value="#{msgs.navLogout}"/>
+			</h:form>
+		</div>
+	</ui:define>
+	<ui:define name="contentfull">
+		<h:form id="workpackage_create_edit" style="margin:5px">
+			<div id="summarytitle" style="font-size: 18pt; width: 98%; color: #76C2C1; margin: 10px; padding-bottom: 10px; border-bottom: 1px solid #5A6364;">
+				#{msgs.wpCreateEditTitle}
+			</div>
+			<p:panelGrid id="dialogPanelGridId">
+				<p:row>
+					<p:column style="font-weight: bold;">#{msgs.id}</p:column>
+					<p:column colspan="8">
+						<p:inputText
+							value="#{projectDriver.currWorkpackage.id.workpackageID}"
+							id="inputWpId"
+							rendered="#{projectDriver.currWorkpackage.id.workpackageID eq null}" >
+							<f:validator validatorId="NotNull"/>
+							<f:attribute name="msg" value="#{msgs.inputWpIdNullError}" />
+						</p:inputText>
+						<h:outputText
+							value="#{projectDriver.currWorkpackage.id.workpackageID}"
+							rendered="#{projectDriver.currWorkpackage.id.workpackageID ne null}" />
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+					</p:column>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.DS}</span>
+					</p:column>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.JS}</span>
+					</p:column>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.P1}</span>
+					</p:column>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.P2}</span>
+					</p:column>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.P3}</span>
+					</p:column>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.P4}</span>
+					</p:column>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.P5}</span>
+					</p:column>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.P6}</span>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="font-weight: bold;">#{msgs.estimateBudget}</p:column>
+					<p:column>
+						<div style="width: 50px;">
+							<p:inputText value="#{projectDriver.currWorkpackage.budget.DSPersonDays}" style="width: 100%">
+								<f:validator validatorId="MinVal" />
+								<f:attribute name="msg" value="#{msgs.DSPersonDaysError}" />
+								<f:attribute name="lowerBound" value="0" />
+								<f:attribute name="upperBound" value="max" />
+							</p:inputText>
+						</div>
+					</p:column>
+					<p:column>
+						<div style="width: 50px;">
+							<p:inputText value="#{projectDriver.currWorkpackage.budget.JSPersonDays}" style="width: 100%">
+								<f:validator validatorId="MinVal" />
+								<f:attribute name="msg" value="#{msgs.JSPersonDaysError}" />
+								<f:attribute name="lowerBound" value="0" />
+								<f:attribute name="upperBound" value="max" />
+							</p:inputText>
+						</div>
+					</p:column>
+					<p:column>
+						<div style="width: 50px;">
+							<p:inputText value="#{projectDriver.currWorkpackage.budget.p1PersonDays}" style="width: 100%">
+								<f:validator validatorId="MinVal" />
+								<f:attribute name="msg" value="#{msgs.p1PersonDaysError}" />
+								<f:attribute name="lowerBound" value="0" />
+								<f:attribute name="upperBound" value="max" />
+							</p:inputText>
+						</div>
+					</p:column>
+					<p:column>
+						<div style="width: 50px;">
+							<p:inputText value="#{projectDriver.currWorkpackage.budget.p2PersonDays}" style="width: 100%">
+								<f:validator validatorId="MinVal" />
+								<f:attribute name="msg" value="#{msgs.p2PersonDaysError}" />
+								<f:attribute name="lowerBound" value="0" />
+								<f:attribute name="upperBound" value="max" />
+							</p:inputText>
+						</div>
+					</p:column>
+					<p:column>
+						<div style="width: 50px;">
+							<p:inputText value="#{projectDriver.currWorkpackage.budget.p3PersonDays}" style="width: 100%">
+								<f:validator validatorId="MinVal" />
+								<f:attribute name="msg" value="#{msgs.p3PersonDaysError}" />
+								<f:attribute name="lowerBound" value="0" />
+								<f:attribute name="upperBound" value="max" />
+							</p:inputText>
+						</div>
+					</p:column>
+					<p:column>
+						<div style="width: 50px;">
+							<p:inputText value="#{projectDriver.currWorkpackage.budget.p4PersonDays}" style="width: 100%">
+								<f:validator validatorId="MinVal" />
+								<f:attribute name="msg" value="#{msgs.p4PersonDaysError}" />
+								<f:attribute name="lowerBound" value="0" />
+								<f:attribute name="upperBound" value="max" />
+							</p:inputText>
+						</div>
+					</p:column>
+					<p:column>
+						<div style="width: 50px;">
+							<p:inputText value="#{projectDriver.currWorkpackage.budget.p5PersonDays}" style="width: 100%">
+								<f:validator validatorId="MinVal" />
+								<f:attribute name="msg" value="#{msgs.p5PersonDaysError}" />
+								<f:attribute name="lowerBound" value="0" />
+								<f:attribute name="upperBound" value="max" />
+							</p:inputText>
+						</div>
+					</p:column>
+					<p:column>
+						<div style="width: 50px;">
+							<p:inputText value="#{projectDriver.currWorkpackage.budget.p6PersonDays}" style="width: 100%">
+								<f:validator validatorId="MinVal" />
+								<f:attribute name="msg" value="#{msgs.p6PersonDaysError}" />
+								<f:attribute name="lowerBound" value="0" />
+								<f:attribute name="upperBound" value="max" />
+							</p:inputText>
+						</div>
+					</p:column>
+				</p:row>
+
+				<p:row>
+					<p:column style="font-weight: bold;">#{msgs.projectStartDate}</p:column>
+					<p:column colspan="8">
+						<p:calendar value="#{projectDriver.currWorkpackage.startDate}" style="background-color: #E5E8E8;"/>
+					</p:column>
+				</p:row>
+
+				<p:row>
+					<p:column style="font-weight: bold;">#{msgs.projectEndDate}</p:column>
+					<p:column colspan="8">
+						<p:calendar value="#{projectDriver.currWorkpackage.endDate}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="font-weight: bold;">#{msgs.title}</p:column>
+					<p:column colspan="8">
+						<p:inputText value="#{projectDriver.currWorkpackage.title}"
+							id="inputWpTitle"
+							style="width: 100%" >
+							<f:validator validatorId="NotNull"/>
+							<f:attribute name="msg" value="#{msgs.inputWpTitleNullError}" />
+						</p:inputText>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="font-weight: bold;">#{msgs.status}</p:column>
+					<p:column colspan="8">
+						<h:selectOneMenu id="workPackageStatusSelector" styleClass="modal" style="width: 101%" value="#{projectDriver.currWorkpackage.status}">
+							<f:selectItems value="#{projectDriver.getWorkPackageStatusList()}" />
+						</h:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="font-weight: bold;">#{msgs.responsibleEngineer}</p:column>
+					<p:column colspan="8">
+						<h:selectOneMenu id="wpLeaderSelector" styleClass="modal" style="width: 101%" value="#{projectDriver.currWorkpackage.responsibleEngineer}" converter="#{projectManagerSelectorConverter}">
+							<f:selectItems value="#{projectDriver.projectManagers}" var="pm" itemLabel="#{pm.firstName} #{pm.lastName}" itemValue="#{pm}" />
+						</h:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="font-weight: bold;">#{msgs.assignedTo}</p:column>
+					<p:column colspan="8">
+						<p:pickList id="employeesPickList"
+							value="#{projectDriver.pickEmps}" style="width: 100%;"
+							converter="employeePickListConverter" var="emps"
+							itemLabel="#{emps.firstName} #{emps.lastName}"
+							itemValue="#{emps}" showSourceFilter="true"
+							showTargetFilter="true" filterMatchMode="contains">
+							<f:facet name="sourceCaption">#{msgs.available}</f:facet>
+							<f:facet name="targetCaption">#{msgs.selected}</f:facet>
+						</p:pickList>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="font-weight: bold;">#{msgs.purpose}</p:column>
+					<p:column colspan="8">
+						<p:inputText value="#{projectDriver.currWorkpackage.purpose}" style="width: 100%"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="font-weight: bold;">#{msgs.activities}</p:column>
+					<p:column colspan="8">
+						<p:inputText value="#{projectDriver.currWorkpackage.activities}" style="width: 100%"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="font-weight: bold;">#{msgs.inputs}</p:column>
+					<p:column colspan="8">
+						<p:inputText value="#{projectDriver.currWorkpackage.inputs}" style="width: 100%"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column style="font-weight: bold;">#{msgs.outputs}</p:column>
+					<p:column colspan="8">
+						<p:inputText value="#{projectDriver.currWorkpackage.outputs}" style="width: 100%"/>
+					</p:column>
+				</p:row>
+				<f:facet name="footer">
+					<p:column colspan="9">
+					</p:column>
+				</f:facet>
+			</p:panelGrid>
+			<div style="margin: 10px 10px 0 10px; width: 98%; height: 1px; background-color: #586465"/>
+			<p:commandLink id="back" class="button3" action="#{projectDriver.currWorkpackageCancel}" immediate="true">
+				<h:graphicImage class="buttonlink3" style="background-color: #76C2C1; margin-right: 0;;" library="images" name="back_icon.png"/>
+			</p:commandLink>
+			<p:tooltip id="backtip" for="back" value="#{msgs.back}" trackMouse="true"/>
+			<p:commandLink id="save" class="button3" action="#{projectDriver.currWorkpackageSave}" update="workpackage_create_edit:msgDialog">
+				<h:graphicImage class="buttonlink3" style="background-color: #F2997D; margin-right: 0;" library="images" name="save_icon.png"/>
+			</p:commandLink>
+			<p:tooltip id="savetip" for="save" value="#{msgs.save}" trackMouse="true"/>
+			<p:outputPanel autoUpdate="true">
+    			<p:dialog id="msgDialog" widgetVar="messageDialog" modal="true" appendToBody="true" header="Errors"
+        			visible="#{facesContext.validationFailed}" position="center center">
+        			<p:messages id="messagesInDialog" />
+    			</p:dialog>
+    		</p:outputPanel>
+		</h:form>
+	</ui:define>
+</ui:composition>

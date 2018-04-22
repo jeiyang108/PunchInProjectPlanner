@@ -1,0 +1,150 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="/templates/userDashTemplate.xhtml">
+	<ui:define name="navbar">
+		<div class="navbar">
+			<h:graphicImage class="logotext" library="images" name="logo_text.png"/>
+			<h:form>
+				<h:commandLink styleClass="navleft" style="color: #76C2C1;" actionListener="#{uiDriver.reset}" action="/sections/employee/workPackages" value="#{msgs.navDashboard}"/>
+				<h:commandLink styleClass="navleft" actionListener="#{uiDriver.reset}" rendered="#{loginBean.currEmp.admin or loginBean.currEmp.basicInfo.credentials.role eq 'HR'}" action="/sections/manager/employees" value="#{msgs.employeeManagement}"/>
+				<h:commandLink styleClass="navleft" actionListener="#{uiDriver.reset}" rendered="#{loginBean.isProjectManager()}" action="/sections/manager/projects?faces-redirect=true" value="#{msgs.projects}"/>
+				<h:commandLink styleClass="navleft" actionListener="#{uiDriver.reset}" rendered="#{loginBean.currEmp.admin or loginBean.projectManager}" action="/sections/manager/reports" value="#{msgs.reports}"/>
+				<h:commandLink styleClass="navleft" actionListener="#{uiDriver.reset}" rendered="#{loginBean.currEmp.timesheetApprover}" action="/sections/manager/timesheets" value="#{msgs.timesheets}"/>
+				<h:commandLink styleClass="navright" actionListener="#{uiDriver.reset}" action="#{loginBean.logout}" value="#{msgs.navLogout}"/>
+			</h:form>
+		</div>
+	</ui:define>
+	<ui:define name="sidebar">
+		<div id="empprofile">
+			<h:graphicImage id="emppic" library="images" name="employee.jpg" />
+			<br />
+			<h:outputText id="empname" value="#{loginBean.username}" />
+			<br />
+			<h:outputText id="emptitle" value="Employee" />
+		</div>
+		<h:form>
+			<div class="button1">
+				<h:commandLink styleClass="buttonlink1" style="background-color: #569D99;" actionListener="#{uiDriver.reset}" action="/sections/employee/workPackages" value="#{msgs.sideWP}" />
+			</div>
+			<div class="button1">
+				<h:commandLink styleClass="buttonlink1" actionListener="#{uiDriver.reset}" action="/sections/employee/timesheets" value="#{msgs.sideTimesheets}" />
+			</div>
+			<div class="button1">
+				<h:commandLink styleClass="buttonlink1" actionListener="#{uiDriver.reset}" action="/sections/employee/projects"	value="#{msgs.sideProjects}" />
+			</div>
+			<div class="button1" style="display:#{(loginBean.isResponsibleEngineer())?'block':'none'}">
+				<h:commandLink styleClass="buttonlink1" rendered="#{loginBean.isResponsibleEngineer()}" actionListener="#{uiDriver.reset}" action="/sections/employee/estimates" value="#{msgs.estimate}" />
+			</div>
+			<div class="button1"/>
+		</h:form>
+	</ui:define>
+	<ui:define name="content">
+		<div class="contentleft">
+			<h:outputText styleClass="contentheading" value="#{msgs.wpSchedule}"/>
+			<h:form>
+				<h:dataTable value="#{projectDAO.findEmployeePackages(loginBean.employeeId)}" var="wp">
+					<h:column>
+						<h:commandLink styleClass="tablelink">
+							<div class="projectlist">
+								<div class="date">
+									<h:outputText value="#{uiDriver.formatDate(wp.endDate, null)}"/>
+									<div class="separator"/>
+								</div>
+								<div class="projectlistcontent">
+									<h:outputText style="font-size: 16pt; font-weight:bold;" value="#{wp.title}"/>
+									<div style="height: 5px;"/>
+									<h:outputText value="#{wp.project.projectName}"/>
+								</div>
+								<div class="projectliststatus #{uiDriver.getWpStatusClass(wp)}">
+									<h:outputText value="#{wp.status}"/>
+								</div>
+							</div>
+							<f:setPropertyActionListener target="#{uiDriver.contentRightWp}" value="true"/>
+							<f:setPropertyActionListener target="#{uiDriver.viewWp}" value="#{wp}"/>
+						</h:commandLink>
+					</h:column>
+				</h:dataTable>
+			</h:form>
+		</div>
+		<div class="contentright">
+			<h:outputText styleClass="contentheading" value="#{msgs.wpDescription}" rendered="#{uiDriver.contentRightWp}"/>
+			<h:form style="margin-top: 20px">
+				<div style="width: 100%; height: 70px;">
+					<div style="float: left;">
+						<h:outputText styleClass="projectdetailsname" value="#{uiDriver.viewWp.title}" rendered="#{uiDriver.contentRightWp}"/>
+					</div>
+					<h:panelGroup style="float: right; margin-top: -15px;" rendered="#{uiDriver.contentRightWp}">
+						<p:commandLink id="edit" class="button3" onclick="PF('editStatus').show();">
+							<h:graphicImage class="buttonlink3" library="images" name="edit_icon.png"/>
+						</p:commandLink>
+						<p:tooltip id="edittip" for="edit" value="#{msgs.edit}" trackMouse="true"/>
+						<div class="projectliststatus #{uiDriver.getWpStatusClass(uiDriver.viewWp)}" style="margin: 17px;">
+							<h:outputText value="#{uiDriver.viewWp.status}"/>
+						</div>
+					</h:panelGroup>
+				</div>
+				<div class="detailsline">
+					<div class="detailscolumn">
+						<h:outputText styleClass="projectdetailslabel" value="#{msgs.wpProjectName}" rendered="#{uiDriver.contentRightWp}"/>
+						<br/>
+						<h:outputText styleClass="projectdetails" value="#{uiDriver.viewWp.project.projectName}" rendered="#{uiDriver.contentRightWp}"/>
+					</div>
+					<div class="detailscolumn">
+						<h:outputText styleClass="projectdetailslabel" value="#{msgs.wpNumber}" rendered="#{uiDriver.contentRightWp}"/>
+						<br/>
+						<h:outputText styleClass="projectdetails" value="#{uiDriver.viewWp.id.workpackageID}" rendered="#{uiDriver.contentRightWp}"/>
+					</div>
+				</div>
+				<div class="detailsline">
+					<div class="detailscolumn">
+						<h:outputText styleClass="projectdetailslabel" value="#{msgs.wpStart}" rendered="#{uiDriver.contentRightWp}"/>
+						<br/>
+						<h:outputText styleClass="projectdetails" value="#{uiDriver.formatDate(uiDriver.viewWp.startDate, 'full')}" rendered="#{uiDriver.contentRightWp}"/>
+					</div>
+					<div class="detailscolumn">
+						<h:outputText styleClass="projectdetailslabel" value="#{msgs.wpEnd}" rendered="#{uiDriver.contentRightWp}"/>
+						<br/>
+						<h:outputText styleClass="projectdetails" value="#{uiDriver.formatDate(uiDriver.viewWp.endDate, 'full')}" rendered="#{uiDriver.contentRightWp}"/>
+					</div>
+				</div>
+				<div class="detailsline">
+					<h:outputText styleClass="projectdetailslabel" value="#{msgs.wpRepEngineer}" rendered="#{uiDriver.contentRightWp}"/>
+					<br/>
+					<h:outputText styleClass="projectdetails" value="#{uiDriver.displayName(uiDriver.viewWp.responsibleEngineer)}" rendered="#{uiDriver.contentRightWp}"/>
+				</div>
+				<div class="detailsline">
+					<h:outputText styleClass="projectdetailslabel" value="#{msgs.wpPurpose}" rendered="#{uiDriver.contentRightWp}"/>
+					<br/>
+					<h:outputText styleClass="projectdetails" value="#{uiDriver.viewWp.purpose}" rendered="#{uiDriver.contentRightWp}"/>
+				</div>
+				<div class="detailsline">
+					<h:outputText styleClass="projectdetailslabel" value="#{msgs.wpInputs}" rendered="#{uiDriver.contentRightWp}"/>
+					<br/>
+					<h:outputText styleClass="projectdetails" value="#{uiDriver.viewWp.inputs}" rendered="#{uiDriver.contentRightWp}"/>
+				</div>
+				<div class="detailsline">
+					<h:outputText styleClass="projectdetailslabel" value="#{msgs.wpActivities}" rendered="#{uiDriver.contentRightWp}"/>
+					<br/>
+					<h:outputText styleClass="projectdetails" value="#{uiDriver.viewWp.activities}" rendered="#{uiDriver.contentRightWp}"/>
+				</div>
+				<div class="detailsline">
+					<h:outputText styleClass="projectdetailslabel" value="#{msgs.wpOutputs}" rendered="#{uiDriver.contentRightWp}"/>
+					<br/>
+					<h:outputText styleClass="projectdetails" value="#{uiDriver.viewWp.outputs}" rendered="#{uiDriver.contentRightWp}"/>
+				</div>
+				<p:dialog header="Edit Status" widgetVar="editStatus" modal="true" height="125" width="250">
+    					<h:selectOneMenu value="#{uiDriver.viewWp.status}" styleClass="modal" style="margin: 15px 60px 0 60px;">
+    						<f:selectItems value="#{projectDriver.getProjectStatusList()}"/>
+    					</h:selectOneMenu>
+    					<br/>
+    					<div class="button2" style="height: 35px; width: 140px;">
+    						<p:commandLink styleClass="buttonlink2" style="color: #FFF; line-height: 35px; width: 140px;" value="#{msgs.save}" ajax="false" action="#{projectDAO.mergeWP(uiDriver.viewWp)}" onclick="PF('editStatus').hide();"/>
+    					</div>
+				</p:dialog>   
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

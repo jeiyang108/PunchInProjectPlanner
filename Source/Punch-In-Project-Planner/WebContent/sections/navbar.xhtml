@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+	<head><title>IGNORED</title></head>
+	<body>
+		<ui:composition>
+			<div class="navbar">
+				<h:graphicImage class="logotext" library="images" name="logo_text.png"/>
+				<h:form>
+					<h:commandLink styleClass="navleft" style="color: #76C2C1;" action="/sections/employee/workPackages" value="#{msgs.navDashboard}"/>
+					<h:commandLink styleClass="navleft" action="/sections/manager/employees" value="#{msgs.employeeManagement}"/>
+					<h:commandLink styleClass="navleft" action="/sections/manager/projects" value="#{msgs.projects}"/>
+					<h:commandLink styleClass="navleft" action="/sections/manager/reports" value="#{msgs.reports}"/>
+					<h:commandLink styleClass="navleft" action="/sections/manager/timesheets" value="#{msgs.timesheets}"/>
+					<h:commandLink styleClass="navright" action="#{loginBean.logout}" value="#{msgs.navLogout}"/>
+				</h:form>
+			</div>
+		</ui:composition>
+	</body>
+</html>

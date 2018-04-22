@@ -1,0 +1,174 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="/templates/managerTemplate.xhtml">
+	<ui:define name="navbar">
+		<div class="navbar">
+			<h:graphicImage class="logotext" library="images"
+				name="logo_text.png" />
+			<h:form>
+				<h:commandLink styleClass="navleft" action="/sections/employee/workPackages" value="#{msgs.navDashboard}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/employees" rendered="#{loginBean.currEmp.admin or loginBean.currEmp.basicInfo.credentials.role eq 'HR'}" value="#{msgs.employeeManagement}"/>
+				<h:commandLink styleClass="navleft" rendered="#{loginBean.isProjectManager()}" action="/sections/manager/projects?faces-redirect=true"  value="#{msgs.projects}"/>
+				<h:commandLink styleClass="navleft" style="color: #76C2C1;" action="/sections/manager/reports" rendered="#{loginBean.currEmp.admin or loginBean.projectManager}" value="#{msgs.reports}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/timesheets"  rendered="#{loginBean.currEmp.timesheetApprover}"  value="#{msgs.timesheets}"/>
+				<h:commandLink styleClass="navright" action="#{loginBean.logout}" value="#{msgs.navLogout}"/>
+			</h:form>
+		</div>
+	</ui:define>
+	<ui:define name="contentfull">
+		<h:form>
+			<div id="summarytitle" style="width: 98%; color: #76C2C1; margin: 10px;">
+				<h:outputFormat value="#{msgs.reportsSummaryTitle}">
+					<f:param value="#{reportBean.currentProject.projectName}"/>
+				</h:outputFormat>
+			</div>
+			<div style="margin: 10px; width: 98%; height: 1px; background-color: #586465"/>
+			<div id="timesheetheading">
+				<div class="timesheetheadingleft" style="width: 60%">
+					<h:outputText styleClass="timesheetheading" value="#{msgs.wpProjectName}"/>
+					<h:outputText styleClass="timesheetheadingcontent" style="width: 60%;" value="#{reportBean.currentProject.projectName}"/>
+				</div>
+				<div class="timesheetheadingmiddle" style="width: 60%; margin-top: 10px;">
+					<h:outputText styleClass="timesheetheading" value="#{msgs.projectNumber}"/>
+					<h:outputText styleClass="timesheetheadingcontent" value="#{reportBean.currentProject.projectNum}"/>
+				</div>
+				<div class="timesheetheadingright" style="width: 60%; margin-top: 10px;">
+					<h:outputText styleClass="timesheetheading" value="#{msgs.projectManager}"/>
+					<h:outputText styleClass="timesheetheadingcontent" style="width: 60%;" value="#{uiDriver.displayName(reportBean.currentProject.projectManager)}"/>
+				</div>
+			</div>
+			<div style="height: 40px;"/> 
+			<p:dataTable style="clear: both;" value="#{reportBean.currentProject.workPackages}"
+				var="wp">
+				<p:column>
+					<f:facet name="header">#{msgs.reportWpNum}</f:facet>
+					#{wp.id.workpackageID}
+				</p:column>
+				<p:column colspan="2">
+					<f:facet name="header">
+						<h:outputText value="Description" />
+					</f:facet>
+					#{wp.purpose}
+				</p:column>
+				<p:column>
+					<f:facet name="header">#{msgs.P6} #{msgs.reportDays}</f:facet>
+					<div style="text-align: right; margin-right: 2px;">
+						#{wp.currentLabourDays.get("P6")}
+					</div>
+					<f:facet name="footer">
+						<div style="text-align: right;">
+							#{reportBean.currentProject.getTotalForLabourGradeDays("P6")}
+						</div>
+					</f:facet>
+				</p:column>
+				<p:column>
+					<f:facet name="header">#{msgs.P5} #{msgs.reportDays}</f:facet>
+					<div style="text-align: right; margin-right: 2px;">
+						#{wp.currentLabourDays.get("P5")}
+					</div>
+					<f:facet name="footer">
+						<div style="text-align: right;">
+							#{reportBean.currentProject.getTotalForLabourGradeDays("P5")}
+						</div>
+					</f:facet>
+				</p:column>
+				<p:column>
+					<f:facet name="header">#{msgs.P4} #{msgs.reportDays}</f:facet>
+					<div style="text-align: right; margin-right: 2px;">
+						#{wp.currentLabourDays.get("P4")}
+					</div>
+					<f:facet name="footer">
+						<div style="text-align: right;">
+							#{reportBean.currentProject.getTotalForLabourGradeDays("P4")}
+						</div>
+					</f:facet>
+				</p:column>
+				<p:column>
+					<f:facet name="header">#{msgs.P3} #{msgs.reportDays}</f:facet>
+					<div style="text-align: right; margin-right: 2px;">
+						#{wp.currentLabourDays.get("P3")}
+					</div>
+					<f:facet name="footer">
+						<div style="text-align: right;">
+							#{reportBean.currentProject.getTotalForLabourGradeDays("P3")}
+						</div>
+					</f:facet>
+				</p:column>
+				<p:column>
+					<f:facet name="header">#{msgs.P2} #{msgs.reportDays}</f:facet>
+					<div style="text-align: right; margin-right: 2px;">
+						#{wp.currentLabourDays.get("P2")}
+					</div>
+					<f:facet name="footer">
+						<div style="text-align: right;">
+							#{reportBean.currentProject.getTotalForLabourGradeDays("P2")}
+						</div>
+					</f:facet>
+				</p:column>
+				<p:column>
+					<f:facet name="header">#{msgs.P1} #{msgs.reportDays}</f:facet>
+					<div style="text-align: right; margin-right: 2px;">
+						#{wp.currentLabourDays.get("P1")}
+					</div>
+					<f:facet name="footer">
+						<div style="text-align: right;">
+							#{reportBean.currentProject.getTotalForLabourGradeDays("P1")}
+						</div>
+					</f:facet>
+				</p:column>
+				<p:column>
+					<f:facet name="header">#{msgs.JS} #{msgs.reportDays}</f:facet>
+					<div style="text-align: right; margin-right: 2px;">
+						#{wp.currentLabourDays.get("JS")}
+					</div>
+					<f:facet name="footer">
+						<div style="text-align: right;">
+							#{reportBean.currentProject.getTotalForLabourGradeDays("JS")}
+						</div>
+					</f:facet>
+				</p:column>
+				<p:column>
+					<f:facet name="header">#{msgs.DS} #{msgs.reportDays}</f:facet>
+					<div style="text-align: right; margin-right: 2px;">
+						#{wp.currentLabourDays.get("DS")}
+					</div>
+					<f:facet name="footer">
+						<div style="text-align: right;">
+							#{reportBean.currentProject.getTotalForLabourGradeDays("DS")}
+						</div>
+					</f:facet>
+				</p:column>
+				<p:column>
+					<f:facet name="header">#{msgs.reportTotal}</f:facet>
+					<div style="text-align: right; margin-right: 2px;">
+						#{wp.calculateTotalCurrentLabourDays()}
+					</div>
+					<f:facet name="footer">
+						<div style="text-align: right;">
+							#{reportBean.currentProject.getTotalForLabourGradeDays("total")}
+						</div>
+					</f:facet>
+				</p:column>
+				<p:column>
+					<f:facet name="header">#{msgs.reportLabourDollars}</f:facet>
+					<div style="text-align: right; margin-right: 2px;">
+						#{wp.calculateTotalCurrentLabourDollars()}
+					</div>
+					<f:facet name="footer">
+						<div style="text-align: right;">
+							#{reportBean.getTotalDollarsForLabourGrade("total")}
+						</div>
+					</f:facet>
+				</p:column>
+			</p:dataTable>
+			<div style="margin: 10px; width: 98%; height: 1px; background-color: #586465"/>
+			<p:commandLink id="back" class="button3" action="reports">
+				<h:graphicImage class="buttonlink3" style="background-color: #76C2C1; margin: 5px 15px;" library="images" name="back_icon.png"/>
+			</p:commandLink>
+			<p:tooltip id="backtip" for="back" value="#{msgs.back}" trackMouse="true"/>
+		</h:form>
+	</ui:define>
+</ui:composition>

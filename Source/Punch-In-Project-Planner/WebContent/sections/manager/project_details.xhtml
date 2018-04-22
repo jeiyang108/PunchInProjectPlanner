@@ -1,0 +1,324 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="/templates/managerTemplate.xhtml">
+	<ui:define name="navbar">
+		<div class="navbar">
+			<h:graphicImage class="logotext" library="images"
+				name="logo_text.png" />
+			<h:form>
+				<h:commandLink styleClass="navleft" action="/sections/employee/workPackages" value="#{msgs.navDashboard}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/employees" rendered="#{loginBean.currEmp.admin or loginBean.currEmp.basicInfo.credentials.role eq 'HR'}" value="#{msgs.employeeManagement}"/>
+				<h:commandLink styleClass="navleft" style="color: #76C2C1;" rendered="#{loginBean.isProjectManager()}" action="/sections/manager/projects?faces-redirect=true"  value="#{msgs.projects}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/reports" rendered="#{loginBean.currEmp.admin or loginBean.projectManager}" value="#{msgs.reports}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/timesheets"  rendered="#{loginBean.currEmp.timesheetApprover}" value="#{msgs.timesheets}"/>
+				<h:commandLink styleClass="navright" action="#{loginBean.logout}" value="#{msgs.navLogout}"/>
+			</h:form>
+		</div>
+	</ui:define>
+	<ui:define name="contentfull">
+		<h:form id="project_details" style="margin:5px">
+			<div>
+				<div id="summarytitle" style="font-size: 18pt; width: 98%; color: #76C2C1; margin: 10px; padding-bottom: 10px; border-bottom: 1px solid #5A6364;">
+					#{msgs.projectDetails}
+				</div>
+				<p:panelGrid>
+					<p:row>
+						<p:column style="font-weight: bold;">#{msgs.id}</p:column>
+						<p:column colspan="8">#{projectDriver.currProj.projectNum}</p:column>
+					</p:row>
+					<p:row>
+						<p:column style="font-weight: bold;">#{msgs.name}</p:column>
+						<p:column colspan="8">#{projectDriver.currProj.projectName}</p:column>
+					</p:row>
+					<p:row>
+						<p:column style="font-weight: bold;">#{msgs.status}</p:column>
+						<p:column colspan="8">
+							<div class="projectliststatus #{uiDriver.getProjectStatusClass(projectDriver.currProj)}" style="margin: 0; float: left;">
+								<h:outputText value="#{projectDriver.currProj.status}"/>
+							</div>
+						</p:column>
+					</p:row>		
+					<p:row>
+						<p:column style="font-weight: bold;">#{msgs.projectManager}</p:column>
+						<p:column colspan="8">#{projectDriver.currProj.projectManager.firstName} #{projectDriver.currProj.projectManager.lastName}</p:column>
+					</p:row>
+					<p:row>
+						<p:column style="font-weight: bold;">#{msgs.projectStartDate}</p:column>
+						<p:column colspan="8">
+							<h:outputText value="#{projectDriver.currProj.startDate}" >
+								<f:convertDateTime type="date" pattern="yyyy-MM-dd"/>
+							</h:outputText>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column style="font-weight: bold;">#{msgs.projectEndDate}</p:column>
+						<p:column colspan="8">
+							<h:outputText value="#{projectDriver.currProj.endDate}" >
+								<f:convertDateTime type="date" pattern="yyyy-MM-dd"/>
+							</h:outputText>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column style="font-weight: bold;">#{msgs.estimateBudget}</p:column>
+						<p:column><span style="font-weight: bold;">#{msgs.DS}</span> <br/> #{projectDriver.currProj.budget.DSPersonDays}</p:column>
+						<p:column><span style="font-weight: bold;">#{msgs.JS}</span> <br/> #{projectDriver.currProj.budget.JSPersonDays}</p:column>
+						<p:column><span style="font-weight: bold;">#{msgs.P1}</span> <br/> #{projectDriver.currProj.budget.p1PersonDays}</p:column>
+						<p:column><span style="font-weight: bold;">#{msgs.P2}</span> <br/> #{projectDriver.currProj.budget.p2PersonDays}</p:column>
+						<p:column><span style="font-weight: bold;">#{msgs.P3}</span> <br/> #{projectDriver.currProj.budget.p3PersonDays}</p:column>
+						<p:column><span style="font-weight: bold;">#{msgs.P4}</span> <br/> #{projectDriver.currProj.budget.p4PersonDays}</p:column>
+						<p:column><span style="font-weight: bold;">#{msgs.P5}</span> <br/> #{projectDriver.currProj.budget.p5PersonDays}</p:column>
+						<p:column><span style="font-weight: bold;">#{msgs.P6}</span> <br/> #{projectDriver.currProj.budget.p6PersonDays}</p:column>
+					</p:row>
+					<p:row>
+						<p:column style="font-weight: bold;">#{msgs.labourSpent}</p:column>
+						<p:column><span style="font-weight: bold;">#{msgs.DS}</span> <br/> #{projectDriver.currProj.getTotalForLabourGradeDays("DS")}</p:column>
+						<p:column><span style="font-weight: bold;">#{msgs.JS}</span> <br/> #{projectDriver.currProj.getTotalForLabourGradeDays("JS")}</p:column>
+						<p:column><span style="font-weight: bold;">#{msgs.P1}</span> <br/> #{projectDriver.currProj.getTotalForLabourGradeDays("P1")}</p:column>
+						<p:column><span style="font-weight: bold;">#{msgs.P2}</span> <br/> #{projectDriver.currProj.getTotalForLabourGradeDays("P2")}</p:column>
+						<p:column><span style="font-weight: bold;">#{msgs.P3}</span> <br/> #{projectDriver.currProj.getTotalForLabourGradeDays("P3")}</p:column>
+						<p:column><span style="font-weight: bold;">#{msgs.P4}</span> <br/> #{projectDriver.currProj.getTotalForLabourGradeDays("P4")}</p:column>
+						<p:column><span style="font-weight: bold;">#{msgs.P5}</span> <br/> #{projectDriver.currProj.getTotalForLabourGradeDays("P5")}</p:column>
+						<p:column><span style="font-weight: bold;">#{msgs.P6}</span> <br/> #{projectDriver.currProj.getTotalForLabourGradeDays("P6")}</p:column>
+					</p:row>
+					<p:row>
+						<p:column style="font-weight: bold;">#{msgs.summary}</p:column>
+						<p:column colspan="8">#{projectDriver.currProj.summary}</p:column>
+					</p:row>
+					<p:row>
+						<p:column style="font-weight: bold;">#{msgs.employees}</p:column>
+						<p:column colspan="8">
+							<div class="datalist-noborder">
+	    						<p:dataList value="#{projectDriver.currProj.getEmployees()}" var="emp" type="ordered"
+	    						emptyMessage="">
+						        	#{emp.firstName}  #{emp.lastName}
+    							</p:dataList>
+    						</div>
+						</p:column>
+					</p:row>			
+				</p:panelGrid>
+			</div>
+			<div>
+				<br/>	
+			</div>
+			<div>
+				<div id="summarytitle" style="font-size: 18pt; width: 98%; color: #76C2C1; margin: 10px; padding-bottom: 10px; border-bottom: 1px solid #5A6364;">
+					#{msgs.workPackages}
+				</div>
+				<p:dataTable headerClass="workpackageheader" footerClass="workpackagefooter"
+					value="#{projectDriver.currProj.workPackages}" editable="true" var="wp"	
+					sortBy="#{wp.id.workpackageID}">
+    			    <p:column style="width:16px">
+            			<p:rowToggler />
+        			</p:column>
+					<p:column>
+						<f:facet name="header">WP ID</f:facet>
+						<h:outputText value="#{wp.id.workpackageID}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">#{msgs.projectStartDate}</f:facet>
+						<h:outputText value="#{uiDriver.formatDate(wp.startDate, 'full')}" />
+					</p:column>
+
+					<p:column>
+						<f:facet name="header">#{msgs.projectEndDate}</f:facet>
+						<h:outputText value="#{uiDriver.formatDate(wp.endDate, 'full')}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">#{msgs.title}</f:facet>
+						<h:outputText value="#{wp.title}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">#{msgs.assignedTo}</f:facet>
+						<div class="datalist-noborder">
+	    						<p:dataList value="#{wp.employees}" var="emp" type="ordered"
+	    						emptyMessage="">
+						        	#{emp.firstName}  #{emp.lastName}
+    							</p:dataList>
+    						</div>
+					</p:column>
+					<p:column>
+						<f:facet name="header">#{msgs.status}</f:facet>
+						<div class="projectliststatus #{uiDriver.getWpStatusClass(wp)}" style="margin: 0;">
+							<h:outputText value="#{wp.status}"/>
+						</div>
+					</p:column>
+					
+					<p:rowExpansion>
+            			<!-- p:panelGrid  columns="2" columnClasses="label,value" style="width:300px" -->
+            			<p:panelGrid columnClasses="label,value">
+            				<p:row>
+            					<p:column>
+            						<h:outputText value="#{msgs.responsibleEngineer}" />
+            					</p:column>
+            					
+            					<p:column colspan="8">
+            						<h:outputText value="#{wp.responsibleEngineer.firstName} #{wp.responsibleEngineer.lastName}" />
+            					</p:column>
+            				</p:row>
+            				
+            				<p:row>
+            					<p:column>
+									<h:outputText value="#{msgs.estimateBudget}" />
+								</p:column>
+								<p:column>
+									<span style="font-weight: bold;">#{msgs.DS}</span>
+									<br/>
+									#{wp.budget.DSPersonDays}
+								</p:column>
+								
+								<p:column>
+            						<span style="font-weight: bold;">#{msgs.JS}</span>
+            						<br/>
+            						#{wp.budget.JSPersonDays}
+            					</p:column>
+            					
+            					<p:column>
+            						<span style="font-weight: bold;">#{msgs.P1}</span>
+            						<br/>
+            						#{wp.budget.p1PersonDays}
+            					</p:column>
+            					
+            					<p:column>
+            						<span style="font-weight: bold;">#{msgs.P2}</span>
+            						<br/>
+            						#{wp.budget.p2PersonDays}
+            					</p:column>
+            					
+            					<p:column>
+            						<span style="font-weight: bold;">#{msgs.P3}</span>
+									<br/>
+            						#{wp.budget.p3PersonDays}
+            					</p:column>
+            					
+            					<p:column>
+            						<span style="font-weight: bold;">#{msgs.P4}</span>
+									<br/>
+            						#{wp.budget.p4PersonDays}
+            					</p:column>
+            					
+            					<p:column>
+		           					<span style="font-weight: bold;">#{msgs.P5}</span>
+									<br/>
+		           					#{wp.budget.p5PersonDays}
+            					</p:column>
+            					
+            					<p:column>
+            						<span style="font-weight: bold;">#{msgs.P6}</span>
+									<br/>
+            						#{wp.budget.p6PersonDays}
+            					</p:column>
+							</p:row>
+
+							<p:row>
+								<p:column>
+									<h:outputText value="#{msgs.actualBudget}" />
+								</p:column>
+								<p:column>
+									<span style="font-weight: bold;">#{msgs.DS}</span>
+									<br/>
+									#{wp.currentLabourDays.get("DS")}
+								</p:column>
+								
+								<p:column>
+            						<span style="font-weight: bold;">#{msgs.JS}</span>
+            						<br/>
+            						#{wp.currentLabourDays.get("JS")}
+            					</p:column>
+            					
+            					<p:column>
+            						<span style="font-weight: bold;">#{msgs.P1}</span>
+            						<br/>
+            						#{wp.currentLabourDays.get("P1")}
+            					</p:column>
+            					
+            					<p:column>
+            						<span style="font-weight: bold;">#{msgs.P2}</span>
+            						<br/>
+            						#{wp.currentLabourDays.get("P2")}
+            					</p:column>
+            					
+            					<p:column>
+            						<span style="font-weight: bold;">#{msgs.P3}</span>
+									<br/>
+            						#{wp.currentLabourDays.get("P3")}
+            					</p:column>
+            					
+            					<p:column>
+            						<span style="font-weight: bold;">#{msgs.P4}</span>
+									<br/>
+            						#{wp.currentLabourDays.get("P4")}
+            					</p:column>
+            					
+            					<p:column>
+		           					<span style="font-weight: bold;">#{msgs.P5}</span>
+									<br/>
+		           					#{wp.currentLabourDays.get("P5")}
+            					</p:column>
+            					
+            					<p:column>
+            						<span style="font-weight: bold;">#{msgs.P6}</span>
+									<br/>
+            						#{wp.currentLabourDays.get("P6")}
+            					</p:column>
+            				</p:row>	
+            				
+            				<p:row>	
+            					<p:column>
+									<h:outputText value="Purpose" />
+								</p:column>
+								<p:column colspan="8">
+	                				<h:outputText value="#{wp.purpose}" />
+	                			</p:column>
+                			</p:row>
+                			
+                			<p:row>
+                				<p:column>
+                					<h:outputText value="Activities" />
+                				</p:column>
+                				<p:column colspan="8">
+                					<h:outputText value="#{wp.activities}" />
+                				</p:column>
+                			</p:row>
+                			
+                			<p:row>
+                				<p:column>
+                					<h:outputText value="Inputs" />
+                				</p:column>
+                				<p:column colspan="8">  
+                					<h:outputText value="#{wp.inputs}" />
+                				</p:column>
+                			</p:row>
+                			
+                			<p:row>
+                				<p:column>
+	                				<h:outputText value="Outputs" />
+	                			</p:column>
+	                			<p:column colspan="8">
+	                				<h:outputText value="#{wp.outputs}" />
+	                			</p:column>
+							</p:row>
+            			</p:panelGrid>
+        			</p:rowExpansion>
+					<!-- 
+					<p:column style="width:80px;text-align: center">
+						<p:commandButton value="#{msgs.view}" Title="view" action="#{projectDriver.viewWorkpackage(wp)}">
+						</p:commandButton>
+					</p:column>
+					-->
+				</p:dataTable>
+				<div style="margin: 10px 10px 0 10px; width: 98%; height: 1px; background-color: #586465"/>
+				<p:commandLink id="back" class="button3" action="projects?faces-redirect=true" immediate="true">
+					<p:graphicImage class="buttonlink3" style="background-color: #76C2C1; margin-right: 0;" library="images" name="back_icon.png"/>
+				</p:commandLink>
+				<p:tooltip id="backtip" for="back" value="#{msgs.back}" trackMouse="true"/>
+				<p:commandLink id="edit" class="button3" action="#{projectDriver.editProject}" rendered="#{projectDriver.currProjEditable}">
+					<h:graphicImage class="buttonlink3" library="images" name="edit_icon.png"/>
+				</p:commandLink>
+				<p:tooltip id="edittip" for="edit" value="#{msgs.edit}" trackMouse="true"/>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

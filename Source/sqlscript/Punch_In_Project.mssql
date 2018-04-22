@@ -1,0 +1,295 @@
+DROP DATABASE timesheetDB;
+CREATE DATABASE timesheetDB;
+
+GRANT ALL PRIVILEGES ON timesheetDB.* TO stock@localhost IDENTIFIED BY 'check';
+GRANT ALL PRIVILEGES ON timesheetDB.* TO stock@'%' IDENTIFIED BY 'check';
+
+USE timesheetDB;
+SHOW ENGINE INNODB STATUS;
+
+DROP TABLE IF EXISTS EmployeeWorkPackage;
+DROP TABLE IF EXISTS ResponsibleEngineerBudget;
+DROP TABLE IF EXISTS WorkPackage;
+DROP TABLE IF EXISTS Project;
+DROP TABLE IF EXISTS Day;
+DROP TABLE IF EXISTS TimesheetRow;
+DROP TABLE IF EXISTS Timesheet;
+DROP TABLE IF EXISTS Credential;
+DROP TABLE IF EXISTS Role;
+DROP TABLE IF EXISTS Employee;
+DROP TABLE IF EXISTS Rate;
+DROP TABLE IF EXISTS LabourGrade;
+DROP TABLE IF EXISTS Budget;
+DROP TABLE IF EXISTS EmployeeLabourGrade;
+
+CREATE TABLE Employee (
+  EmployeeID    BIGINT UNSIGNED         NOT NULL,
+  FirstName     VARCHAR(25)             NOT NULL,
+  LastName      VARCHAR(25)             NOT NULL,
+  SickLeaves    INT UNSIGNED            NULL,
+  Vacation      FLOAT UNSIGNED          NULL,
+  FlexTime      DECIMAL(4,2) UNSIGNED   NULL,
+  TimesheetApprover		BIGINT UNSIGNED	NOT NULL,
+  Supervisor	BIGINT UNSIGNED			NOT NULL,
+  PRIMARY KEY (EmployeeID),
+  FOREIGN KEY (TimesheetApprover) REFERENCES Employee (EmployeeID) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (Supervisor) REFERENCES Employee (EmployeeID) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+INSERT INTO Employee VALUES(1, 'Albert', 'Einstein', NULL, NULL, NULL, 1, 1);
+INSERT INTO Employee VALUES(2, 'Blase', 'Pascal', NULL, NULL, NULL, 2, 1);
+INSERT INTO Employee VALUES(3, 'Jane', 'Goodall', NULL, NULL, NULL, 2, 1);
+INSERT INTO Employee VALUES(4, 'Dorothy', 'Hodgkin', NULL, NULL, NULL, 2, 1);
+
+
+CREATE TABLE LabourGrade (
+  LabourGradeID CHAR(3) NOT NULL,
+  PRIMARY KEY (LabourGradeID)
+);
+
+INSERT INTO LabourGrade VALUES('JS');
+INSERT INTO LabourGrade VALUES('DS');
+INSERT INTO LabourGrade VALUES('P1');
+INSERT INTO LabourGrade VALUES('P2');
+INSERT INTO LabourGrade VALUES('P3');
+INSERT INTO LabourGrade VALUES('P4');
+INSERT INTO LabourGrade VALUES('P5');
+INSERT INTO LabourGrade VALUES('P6');
+
+CREATE TABLE Rate (
+  RateID		BIGINT UNSIGNED			NOT NULL AUTO_INCREMENT,
+  LabourGradeID CHAR(3) 				NOT NULL,
+  StartDate 	DATE 					NOT NULL,
+  DailyRate 	DECIMAL(6,2) UNSIGNED 	NOT NULL,
+  PRIMARY KEY (RateID),
+  FOREIGN KEY (LabourGradeID) REFERENCES LabourGrade (LabourGradeID) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+INSERT INTO Rate VALUES(NULL, 'JS', '2017-12-1', 20.25);
+INSERT INTO Rate VALUES(NULL, 'DS', '2017-1-1', 23.25);
+INSERT INTO Rate VALUES(NULL, 'P1', '2017-11-1', 25.25);
+INSERT INTO Rate VALUES(NULL, 'P2', '2017-2-1', 28.25);
+INSERT INTO Rate VALUES(NULL, 'P3', '2017-10-1', 30.25);
+INSERT INTO Rate VALUES(NULL, 'P4', '2017-5-1', 34.25);
+INSERT INTO Rate VALUES(NULL, 'P5', '2017-6-1', 37.25);
+INSERT INTO Rate VALUES(NULL, 'P6', '2017-2-1', 45.25);
+
+CREATE TABLE EmployeeLabourGrade (
+  EmployeeID	BIGINT UNSIGNED 	NOT NULL,
+  LabourGradeID	CHAR(3) 		NOT NULL,
+  PromotionDate DATE			NULL,
+  PRIMARY KEY (EmployeeID, LabourGradeID),
+  FOREIGN KEY (EmployeeID) REFERENCES Employee (EmployeeID) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (LabourGradeID) REFERENCES LabourGrade (LabourGradeID) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+INSERT INTO EmployeeLabourGrade VALUES(1, 'P1', NULL);
+INSERT INTO EmployeeLabourGrade VALUES(2, 'DS', NULL);
+INSERT INTO EmployeeLabourGrade VALUES(3, 'P2', NULL);
+INSERT INTO EmployeeLabourGrade VALUES(4, 'P3', NULL);
+
+CREATE TABLE Credential (
+	EmployeeID 		BIGINT UNSIGNED	NOT NULL,
+	UserName 	    VARCHAR(25) 		NOT NULL,
+	Password 		VARCHAR(255) 		NOT NULL,
+	Salt 		    VARCHAR(45) 		NOT NULL,
+    Role			VARCHAR(30)			NOT NULL,
+    PRIMARY KEY (UserName),
+    FOREIGN KEY (EmployeeID) REFERENCES Employee (EmployeeID) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+INSERT INTO Credential VALUES(1, 'admin', '99d2c681d92e73b0297259f8e1f057c18426670599cf50f1db9b11e02c3344aa83fd9ba4b3dd076ea618e480f7bd651858ecc27bb9e932f961cdf09a1e647c1f', 'j6MYqBbqDdB+HEzBxLM5Rw==', 'employee');
+INSERT INTO Credential VALUES(2, 'projManager', '99d2c681d92e73b0297259f8e1f057c18426670599cf50f1db9b11e02c3344aa83fd9ba4b3dd076ea618e480f7bd651858ecc27bb9e932f961cdf09a1e647c1f', 'j6MYqBbqDdB+HEzBxLM5Rw==', 'employee');
+INSERT INTO Credential VALUES(3, 'userA', '99d2c681d92e73b0297259f8e1f057c18426670599cf50f1db9b11e02c3344aa83fd9ba4b3dd076ea618e480f7bd651858ecc27bb9e932f961cdf09a1e647c1f', 'j6MYqBbqDdB+HEzBxLM5Rw==', 'employee');
+INSERT INTO Credential VALUES(4, 'userB', '99d2c681d92e73b0297259f8e1f057c18426670599cf50f1db9b11e02c3344aa83fd9ba4b3dd076ea618e480f7bd651858ecc27bb9e932f961cdf09a1e647c1f', 'j6MYqBbqDdB+HEzBxLM5Rw==', 'employee');
+
+CREATE TABLE Timesheet (
+  TimesheetID   INTEGER UNSIGNED		NOT NULL	AUTO_INCREMENT,
+  EmployeeID    BIGINT UNSIGNED        NOT NULL,
+  WeekEnd       DATE                    NOT NULL,
+  OverTime      DECIMAL(4,2) UNSIGNED   NULL,
+  FlexTime      DECIMAL(4,2) UNSIGNED   NULL,
+  Approval      BOOLEAN              	NOT NULL,
+  PRIMARY KEY (TimesheetID),
+  FOREIGN KEY (EmployeeID) REFERENCES Employee (EmployeeID) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
+INSERT INTO Timesheet VALUES(NULL, 1, '2017-11-17', NULL, NULL, FALSE);
+INSERT INTO Timesheet VALUES(NULL, 1, '2017-11-24', 4, NULL, FALSE);
+INSERT INTO Timesheet VALUES(NULL, 1, '2017-12-1', NULL, 4, FALSE);
+
+INSERT INTO Timesheet VALUES(NULL, 2, '2017-11-17', NULL, NULL, TRUE);
+INSERT INTO Timesheet VALUES(NULL, 2, '2017-11-24', 4, NULL, TRUE);
+INSERT INTO Timesheet VALUES(NULL, 2, '2017-12-1', NULL, 4, TRUE);
+
+INSERT INTO Timesheet VALUES(NULL, 3, '2017-11-17', NULL, NULL, FALSE);
+INSERT INTO Timesheet VALUES(NULL, 3, '2017-11-24', NULL, NULL, FALSE);
+INSERT INTO Timesheet VALUES(NULL, 3, '2017-12-1', NULL, NULL, FALSE);
+
+CREATE TABLE Project (
+  ProjectNum	INT UNSIGNED		NOT NULL,
+  ProjectName	VARCHAR(30)			NOT NULL,
+  ProjectManagerID BIGINT UNSIGNED	NOT NULL,
+  StartDate		DATETIME			NULL,
+  EndDate 		DATETIME			NULL,
+  Status		VARCHAR(30)			NOT NULL,
+  Summary		VARCHAR(255)		NULL,
+  PRIMARY KEY (ProjectNum),
+  FOREIGN KEY (ProjectManagerID) REFERENCES Employee (EmployeeID) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+INSERT INTO Project VALUES(010, 'Android Development', 2, NULL, NULL, 'Started', 'Started production');
+INSERT INTO Project VALUES(1205, 'iOS Development', 2, NULL, NULL, 'Started', 'Assigning tasks');
+INSERT INTO Project VALUES(3710, 'Web Development', 2, NULL, NULL, 'Started', 'Development started');
+
+
+CREATE TABLE Budget (
+	ProjectNum				INT	UNSIGNED			NOT NULL,
+	JSPersonDays			FLOAT					NULL,
+    DSPersonDays			FLOAT					NULL,
+    P1PersonDays			FLOAT					NULL,
+    P2PersonDays			FLOAT					NULL,
+    P3PersonDays			FLOAT					NULL,
+    P4PersonDays			FLOAT					NULL,
+    P5PersonDays			FLOAT					NULL,
+    P6PersonDays			FLOAT					NULL,
+    PRIMARY KEY	(ProjectNum),
+    FOREIGN KEY (ProjectNum) REFERENCES Project (ProjectNum) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+INSERT INTO Budget VALUES(010, 10.0, 15.0, 12.5, NULL, 11.5, NULL, NULL, 10.0);
+INSERT INTO Budget VALUES(1205, 11.5, NULL, NULL, NULL, 13.5, NULL, NULL, 8.0);
+INSERT INTO Budget VALUES(3710, 13.0, 16.0, 12.5, NULL, 15.0, NULL, NULL, 12.0);
+
+CREATE TABLE WorkPackage (
+  WorkpackageID 		    VARCHAR(10) 			NOT NULL,
+  ProjectNum 			    INT UNSIGNED 			NOT NULL,
+  Title 				    VARCHAR(30) 			NOT NULL,
+  ResponsibleEngineerID 	BIGINT UNSIGNED 		NOT NULL,
+  StartDate 			    DATETIME 				NULL,
+  EndDate 				    DATETIME 				NULL,
+  ParentWPID				VARCHAR(10)				NULL,
+  ParentProjectNum			INT UNSIGNED			NULL,
+  Status					VARCHAR(30) 			NOT NULL,
+  Purpose					VARCHAR(255)			NULL,
+  Activities				VARCHAR(255)			NULL,
+  Inputs					VARCHAR(255)			NULL,
+  Outputs					VARCHAR(255)			NULL,
+  PRIMARY KEY (WorkpackageID, ProjectNum),
+  FOREIGN KEY (ProjectNum) REFERENCES Project (ProjectNum) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (ResponsibleEngineerID) REFERENCES Employee (EmployeeID) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (ParentWPID, ParentProjectNum) REFERENCES WorkPackage (WorkPackageID, ProjectNum) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+INSERT INTO WorkPackage VALUES('PRJS', 010, 'Project Set-up', 1, NULL, NULL, NULL, NULL, 'Started', 'To set up project', 'Set up the project', 'Technologies that are needed for the project', 'Project set up');
+INSERT INTO WorkPackage VALUES('DDPL', 010, 'Design and Development Plan', 2, NULL, NULL, 'PRJS', 010, 'Started', 'To complete the development plan', 'Design the development plan', 'Requirements for the project', 'Completed design and development plan');
+INSERT INTO WorkPackage VALUES('SYSTP', 010, 'System Test Plan', 3, NULL, NULL, 'DDPL', 010, 'Started', 'Come up with test plans for the system', 'Develop test plan', 'Testers', 'Test plan');
+INSERT INTO WorkPackage VALUES('PRJS', 1205, 'Project Set-up', 1, NULL, NULL, NULL, 1205, 'Started', 'To set up project', 'Set up the project', 'Technologies that are needed for the project', 'Project set up');
+INSERT INTO WorkPackage VALUES('DDPL', 1205, 'Design and Development Plan', 2, NULL, NULL, 'PRJS', 1205, 'Started', 'To complete the development plan', 'Design the development plan', 'Requirements for the project', 'Completed design and development plan');
+INSERT INTO WorkPackage VALUES('SYSTP', 1205, 'System Test Plan', 3, NULL, NULL, 'DDPL', 1205, 'Started', 'Come up with test plans for the system', 'Develop test plan', 'Testers', 'Test plan');
+INSERT INTO WorkPackage VALUES('PRJS', 3710, 'Project Set-up', 1, NULL, NULL, NULL, NULL, 'Started', 'To set up project', 'Set up the project', 'Technologies that are needed for the project', 'Project set up');
+INSERT INTO WorkPackage VALUES('DDPL', 3710, 'Design and Development Plan', 2, NULL, NULL, 'PRJS', 3710, 'Started', 'To complete the development plan', 'Design the development plan', 'Requirements for the project', 'Completed design and development plan');
+INSERT INTO WorkPackage VALUES('SYSTP', 3710, 'System Test Plan', 3, NULL, NULL, 'DDPL', 3710, 'Started', 'Come up with test plans for the system', 'Develop test plan', 'Testers', 'Test plan');
+INSERT INTO WorkPackage VALUES('ABCD', 010, 'Deployment', 1, NULL, NULL, 'SYSTP', 010, 'Started', 'Complete deployment of the system', 'Get ready for deployment', 'Platforms to deploy', 'System deployed on the platforms');
+INSERT INTO WorkPackage VALUES('ABCD', 1205, 'Deployment', 2, NULL, NULL, 'SYSTP', 1205, 'Started', 'Complete deployment of the system', 'Get ready for deployment', 'Platforms to deploy', 'System deployed on the platforms');
+INSERT INTO WorkPackage VALUES('ABCD', 3710, 'Deployment', 3, NULL, NULL, 'SYSTP', 3710, 'Started', 'Complete deployment of the system', 'Get ready for deployment', 'Platforms to deploy', 'System deployed on the platforms');
+
+CREATE TABLE ResponsibleEngineerBudget (
+	WorkPackageID			VARCHAR(10)				NOT NULL,
+    ProjectNum				INT	UNSIGNED			NOT NULL,
+    JSPersonDays			FLOAT					NULL,
+    DSPersonDays			FLOAT					NULL,
+    P1PersonDays			FLOAT					NULL,
+    P2PersonDays			FLOAT					NULL,
+    P3PersonDays			FLOAT					NULL,
+    P4PersonDays			FLOAT					NULL,
+    P5PersonDays			FLOAT					NULL,
+    P6PersonDays			FLOAT					NULL,
+    PRIMARY KEY (WorkPackageID, ProjectNum),
+    FOREIGN KEY (WorkPackageID, ProjectNum) REFERENCES WorkPackage (WorkPackageID, ProjectNum)
+);
+
+INSERT INTO ResponsibleEngineerBudget VALUES('PRJS', 010, NULL, NULL, NULL, NULL, 3.5, NULL, NULL, 5.0);
+INSERT INTO ResponsibleEngineerBudget VALUES('DDPL', 010, 3.5, 7.0, NULL, NULL, 4, NULL, NULL, 2.0);
+INSERT INTO ResponsibleEngineerBudget VALUES('SYSTP', 010, NULL, NULL, 4.5, 5.5, 3.5, NULL, 4.0, 2.0);
+INSERT INTO ResponsibleEngineerBudget VALUES('PRJS', 1205, 5.0, 2.5, NULL, NULL, 3.5, NULL, NULL, 5.0);
+INSERT INTO ResponsibleEngineerBudget VALUES('DDPL', 1205, 1.5, NULL, 4.5, 5.5, 3.5, NULL, NULL, 7.0);
+INSERT INTO ResponsibleEngineerBudget VALUES('SYSTP', 1205, NULL, NULL, 2.5, 12.0, 3.5, NULL, NULL, 5.0);
+INSERT INTO ResponsibleEngineerBudget VALUES('PRJS', 3710, 6.5, NULL, 3.5, NULL, 3.5, NULL, NULL, 5.0);
+INSERT INTO ResponsibleEngineerBudget VALUES('DDPL', 3710, NULL, 7.5, 5.0, 2.0, 3.5, NULL, NULL, 5.0);
+INSERT INTO ResponsibleEngineerBudget VALUES('SYSTP', 3710, NULL, NULL, NULL, NULL, 3.5, NULL, NULL, 5.0);
+INSERT INTO ResponsibleEngineerBudget VALUES('ABCD', 010, NULL, 5.5, 2.5, 6.5, 3.5, NULL, NULL, 5.0);
+INSERT INTO ResponsibleEngineerBudget VALUES('ABCD', 1205, 5.0, 12.0, 1.0, NULL, 3.5, NULL, NULL, 5.0);
+INSERT INTO ResponsibleEngineerBudget VALUES('ABCD', 3710, 5.0, 2.0, 1.0, 6.5, 3.5, 1.0, 2.0, 5.0);
+
+CREATE TABLE TimesheetRow (
+  TimesheetRowID    INT UNSIGNED            NOT NULL AUTO_INCREMENT,
+  TimesheetID       INTEGER UNSIGNED       	NOT NULL,
+  NOTES             VARCHAR(100)            NULL,
+  ProjectNum		INT UNSIGNED			NULL,
+  WorkPackageID		VARCHAR(10)				NULL,
+  PRIMARY KEY (TimesheetRowID),
+  FOREIGN KEY (TimesheetID) REFERENCES Timesheet (TimesheetID) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (ProjectNum, WorkPackageID) REFERENCES WorkPackage (ProjectNum, WorkPackageID) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+INSERT INTO TimesheetRow VALUES(NULL, 1, NULL, 010, 'PRJS');
+INSERT INTO TimesheetRow VALUES(NULL, 1, 'Lunch with Boss', 010, 'DDPL');
+INSERT INTO TimesheetRow VALUES(NULL, 1, NULL, 010, 'SYSTP');
+INSERT INTO TimesheetRow VALUES(NULL, 1, NULL, 010, 'ABCD');
+
+INSERT INTO TimesheetRow VALUES(NULL, 2, NULL, 1205, 'PRJS');
+INSERT INTO TimesheetRow VALUES(NULL, 2, 'Ended Early', 1205, 'DDPL');
+INSERT INTO TimesheetRow VALUES(NULL, 2, NULL, 1205, 'SYSTP');
+INSERT INTO TimesheetRow VALUES(NULL, 2, NULL, 1205, 'ABCD');
+
+INSERT INTO TimesheetRow VALUES(NULL, 3, NULL, 3710, 'PRJS');
+INSERT INTO TimesheetRow VALUES(NULL, 3, 'Lunch with myself', 3710, 'DDPL');
+INSERT INTO TimesheetRow VALUES(NULL, 3, NULL, 3710, 'SYSTP');
+INSERT INTO TimesheetRow VALUES(NULL, 3, NULL, 3710, 'ABCD');
+
+
+CREATE TABLE Day (
+  DayID				INT						NOT NULL AUTO_INCREMENT,
+  DayOfWeek         TINYINT               	NOT NULL,
+  Hour              DECIMAL(4,2) UNSIGNED   NOT NULL,
+  TimesheetRowID    INT UNSIGNED            NOT NULL,
+  PRIMARY KEY (DayID),
+  FOREIGN KEY (TimesheetRowID) REFERENCES TimesheetRow (TimesheetRowID) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT DayOfWeek_Ck CHECK (DayOfWeek BETWEEN 1 AND 7)
+);
+
+INSERT INTO `Day` VALUES(NULL, 1, 12, 1);
+INSERT INTO `Day` VALUES(NULL, 2, 0, 1);
+INSERT INTO `Day` VALUES(NULL, 3, 1, 1);
+INSERT INTO `Day` VALUES(NULL, 4, 5, 1);
+INSERT INTO `Day` VALUES(NULL, 5, 2, 1);
+INSERT INTO `Day` VALUES(NULL, 6, 8, 1);
+
+INSERT INTO `Day` VALUES(NULL, 1, 2, 2);
+INSERT INTO `Day` VALUES(NULL, 2, 12, 2);
+INSERT INTO `Day` VALUES(NULL, 3, 5, 2);
+INSERT INTO `Day` VALUES(NULL, 4, 12, 2);
+INSERT INTO `Day` VALUES(NULL, 5, 1, 2);
+
+INSERT INTO `Day` VALUES(NULL, 1, 7.5, 3);
+INSERT INTO `Day` VALUES(NULL, 2, 7.5, 3);
+INSERT INTO `Day` VALUES(NULL, 3, 7.5, 3);
+INSERT INTO `Day` VALUES(NULL, 4, 7.5, 3);
+INSERT INTO `Day` VALUES(NULL, 5, 7.5, 3);
+
+CREATE TABLE EmployeeWorkPackage (
+  EmployeeID    BIGINT UNSIGNED	NOT NULL,
+  WorkPackageID VARCHAR(10)     	NOT NULL,
+  ProjectNum	INT UNSIGNED 		NOT NULL,
+  FOREIGN KEY (EmployeeID) REFERENCES Employee (EmployeeID),
+  FOREIGN KEY (WorkPackageID, ProjectNum) REFERENCES WorkPackage (WorkpackageID, ProjectNum) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+INSERT INTO EmployeeWorkPackage VALUES(1, 'PRJS', 010);
+INSERT INTO EmployeeWorkPackage VALUES(1, 'DDPL', 010);
+INSERT INTO EmployeeWorkPackage VALUES(1, 'SYSTP', 010);
+INSERT INTO EmployeeWorkPackage VALUES(2, 'PRJS', 1205);
+INSERT INTO EmployeeWorkPackage VALUES(3, 'DDPL', 010);
+INSERT INTO EmployeeWorkPackage VALUES(4, 'SYSTP', 3710);

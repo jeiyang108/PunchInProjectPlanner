@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"  
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:p="http://primefaces.org/ui"
+	  xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head><title>IGNORED</title></h:head>
+<h:body>
+	<ui:composition template="/templates/masterTemplate.xhtml">
+		<ui:define name="navbar">
+			<div class="navbar">
+				<h:graphicImage class="logotext" library="images" name="logo_text.png"/>
+			</div>
+		</ui:define>
+		<ui:define name="main">
+			<h:form>
+				<div id="login">
+					<h:graphicImage class="logo" library="images" name="logo.png"/><br/>
+					<p:inputText id="username" value="#{loginBean.username}" class="logininput"/>
+					<p:watermark for="username" value="#{msgs.userHint}"/>
+					<br/>
+					<p:password id="password" value="#{loginBean.password}" class="logininput"/>
+					<p:watermark for="password" value="#{msgs.passHint}"/>
+					<div class="button2">
+						<h:commandLink styleClass="buttonlink2" action="#{loginBean.login}" value="#{msgs.loginButton}"/>
+					</div>
+				</div>
+			</h:form>
+		</ui:define>
+	</ui:composition>
+</h:body>
+</html>

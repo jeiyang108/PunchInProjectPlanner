@@ -1,0 +1,207 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="/templates/managerTemplate.xhtml">
+	<ui:define name="navbar">
+		<div class="navbar">
+			<h:graphicImage class="logotext" library="images" name="logo_text.png"/>
+			<h:form>
+				<h:commandLink styleClass="navleft" action="/sections/employee/workPackages" value="#{msgs.navDashboard}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/employees" rendered="#{loginBean.currEmp.admin or loginBean.currEmp.basicInfo.credentials.role eq 'HR'}" value="#{msgs.employeeManagement}"/>
+				<h:commandLink styleClass="navleft" rendered="#{loginBean.isProjectManager()}" action="/sections/manager/projects?faces-redirect=true"  value="#{msgs.projects}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/reports" rendered="#{loginBean.currEmp.admin or loginBean.projectManager}" value="#{msgs.reports}"/>
+				<h:commandLink styleClass="navleft" style="color: #76C2C1;" action="/sections/manager/timesheets"  rendered="#{loginBean.currEmp.timesheetApprover}" value="#{msgs.timesheets}"/>
+				<h:commandLink styleClass="navright" action="#{loginBean.logout}" value="#{msgs.navLogout}"/>
+			</h:form>
+		</div>
+	</ui:define>
+		<ui:define name="contentfull">
+			<h:form>	
+				<div id="summarytitle" style="width: 98%; color: #76C2C1; margin: 10px;">
+					#{msgs.timesheetAppRej}
+				</div>
+				<div style="margin: 10px; width: 98%; height: 1px; background-color: #586465"/>
+				<div id="timesheetheading">
+					<div class="timesheetheadingleft">
+						<h:outputText styleClass="timesheetheading" value="#{msgs.timesheetEmpNum}"/>
+						<h:outputText styleClass="timesheetheadingcontent" value="#{timesheetDriver.ts.employee.employeeID}"/>
+						<br/>
+						<h:outputText styleClass="timesheetheading" value="#{msgs.timesheetEmpName}"/>
+						<h:outputText styleClass="timesheetheadingcontent" style="width: 215px;" value="#{uiDriver.displayName(timesheetDriver.ts.employee)}"/>
+					</div>
+					<div class="timesheetheadingmiddle">
+						<h:outputText styleClass="timesheetheading" value="#{msgs.timesheetWeekNum}"/>
+						<h:outputText styleClass="timesheetheadingcontent" value="#{timesheetDriver.ts.weekNumber}"/>
+					</div>
+					<div class="timesheetheadingright">
+						<h:outputText styleClass="timesheetheading" value="#{msgs.timesheetWeekEnd}"/>
+						<h:outputText styleClass="timesheetheadingcontent" value="#{timesheetDriver.ts.endWeek}"/>
+					</div>
+				</div>
+				<div id="timesheet">
+					<h:dataTable headerClass="timesheetheader"
+						value="#{timesheetDriver.ts.entries}"
+						var="row">
+							 <h:column>
+								<f:facet name="header">
+									#{msgs.projectNum}
+								</f:facet>
+								<div class="medcol" style="width: 135px">
+									<h:outputText styleClass="medcol" value="#{row.workPackage.project.projectName}"/>
+								</div>
+								<f:facet name="footer">
+									<div style="margin: 10px 0;">
+										<h:outputText styleClass="timesheetfooter" style="margin-left: 10px;" value="#{msgs.timesheetTotal}"/>
+									</div>
+									<div style="margin-bottom: 10px;">
+										<h:outputText styleClass="timesheetfooter" style="margin-left: 10px;" value="#{msgs.timesheetOvertime}"/>
+									</div>
+									<div style="margin-bottom: 10px;">
+										<h:outputText styleClass="timesheetfooter" style="margin-left: 10px;" value="#{msgs.timesheetFlextime}"/>
+									</div>
+								</f:facet>
+							</h:column>
+							<h:column>
+								<f:facet name="header">
+									#{msgs.timesheetWP}
+								</f:facet>
+								<div class="medcol">
+									<h:outputText styleClass="medcol" value="#{row.workPackage.id.workpackageID}"/>
+								</div>
+								<f:facet name="footer">
+									<div style="margin: 10px 20px 10px 0; text-align: right;">
+										<h:outputText styleClass="timesheetfooter" value="#{timesheetDriver.ts.totalHours}"/>
+									</div>
+									<div style="margin: 10px 20px 10px 0; text-align: right;">
+										<h:outputText styleClass="timesheetfooter" value="0"/>
+									</div>
+									<div style="margin: 10px 20px 10px 0; text-align: right;">
+										<h:outputText styleClass="timesheetfooter" value="0"/>
+									</div>
+								</f:facet>
+							</h:column>
+							<h:column>
+								<f:facet name="header">
+									#{msgs.timesheetSun}
+								</f:facet>
+								<div class="smcol" style="margin: 10px 1px; text-align: right;">
+									<h:outputText styleClass="smcol" value="#{row.getDayOfWeek(1).hoursWorked}"/>
+								</div>
+								<f:facet name="footer">
+									<div style="margin-top: -38px; margin-right: 20px; text-align: right;">
+										<h:outputText styleClass="timesheetfooter" value="#{timesheetDriver.ts.getTotalHoursByWeekday(1)}"/>
+									</div>
+								</f:facet>
+							</h:column>							
+							<h:column>
+								<f:facet name="header">
+									#{msgs.timesheetMon}
+								</f:facet>
+								<div class="smcol" style="margin: 10px 1px; text-align: right;">
+									<h:outputText styleClass="smcol" value="#{row.getDayOfWeek(2).hoursWorked}"/>
+								</div>
+								<f:facet name="footer">
+									<div style="margin-top: -38px; margin-right: 20px; text-align: right;">
+										<h:outputText styleClass="timesheetfooter" value="#{timesheetDriver.ts.getTotalHoursByWeekday(2)}"/>
+									</div>
+								</f:facet>
+							</h:column>							
+							<h:column>
+								<f:facet name="header">
+									#{msgs.timesheetTue}
+								</f:facet>
+								<div class="smcol" style="margin: 10px 1px; text-align: right;">
+									<h:outputText styleClass="smcol" value="#{row.getDayOfWeek(3).hoursWorked}"/>
+								</div>
+								<f:facet name="footer">
+									<div style="margin-top: -38px; margin-right: 20px; text-align: right;">
+										<h:outputText styleClass="timesheetfooter" value="#{timesheetDriver.ts.getTotalHoursByWeekday(3)}"/>
+									</div>
+								</f:facet>
+							</h:column>							
+							<h:column>
+								<f:facet name="header">
+									#{msgs.timesheetWed}
+								</f:facet>
+								<div class="smcol" style="margin: 10px 1px; text-align: right;">
+									<h:outputText styleClass="smcol" value="#{row.getDayOfWeek(4).hoursWorked}"/>
+								</div>
+								<f:facet name="footer">
+									<div style="margin-top: -38px; margin-right: 20px; text-align: right;">
+										<h:outputText styleClass="timesheetfooter" value="#{timesheetDriver.ts.getTotalHoursByWeekday(4)}"/>
+									</div>
+								</f:facet>
+							</h:column>							
+							<h:column>
+								<f:facet name="header">
+									#{msgs.timesheetThu}
+								</f:facet>
+								<div class="smcol" style="margin: 10px 1px; text-align: right;">
+									<h:outputText styleClass="smcol" value="#{row.getDayOfWeek(5).hoursWorked}"/>
+								</div>
+								<f:facet name="footer">
+									<div style="margin-top: -38px; margin-right: 20px; text-align: right;">
+										<h:outputText styleClass="timesheetfooter" value="#{timesheetDriver.ts.getTotalHoursByWeekday(5)}"/>
+									</div>
+								</f:facet>
+							</h:column>							
+							<h:column>
+								<f:facet name="header">
+									#{msgs.timesheetFri}
+								</f:facet>
+								<div class="smcol" style="margin: 10px 1px; text-align: right;">
+									<h:outputText styleClass="smcol" value="#{row.getDayOfWeek(6).hoursWorked}"/>
+								</div>
+								<f:facet name="footer">
+									<div style="margin-top: -38px; margin-right: 20px; text-align: right;">
+										<h:outputText styleClass="timesheetfooter" value="#{timesheetDriver.ts.getTotalHoursByWeekday(6)}"/>
+									</div>
+								</f:facet>
+							</h:column>
+							<h:column>
+								<f:facet name="header">
+									#{msgs.timesheetSat}
+								</f:facet>
+								<div class="smcol" style="margin: 10px 1px; text-align: right;">
+									<h:outputText styleClass="smcol" value="#{row.getDayOfWeek(7).hoursWorked}"/>
+								</div>
+								<f:facet name="footer">
+									<div style="margin-top: -38px; margin-right: 20px; text-align: right;">
+										<h:outputText styleClass="timesheetfooter" value="#{timesheetDriver.ts.getTotalHoursByWeekday(7)}"/>
+									</div>
+								</f:facet>
+							</h:column>							
+							<h:column>
+								<f:facet name="header">
+									#{msgs.timesheetNotes}
+								</f:facet>
+								<div class="lgcol">
+									<h:outputText styleClass="lgcol" value="#{row.notes}"/>
+								</div>								
+							</h:column>		
+					</h:dataTable>
+				</div>
+				<div style="margin: 10px; width: 98%; height: 1px; background-color: #586465"/>
+				<div style="margin-top: 20px;">
+  	 				<h:outputLabel styleClass="timesheetheading" style="font-size: 14pt">#{msgs.approverNotes}</h:outputLabel>
+  	 			</div>
+  	 			<br/>
+				<p:inputTextarea style="margin: 0 10px; width: 97%;" rows="6" cols="100" value="#{timesheetDriver.ts.approvalNotes}"/>
+				<br/>
+				<p:commandLink id="back" class="button3" action="timesheets" immediate="true">
+					<h:graphicImage class="buttonlink3" style="background-color: #76C2C1; margin: 15px 0 5px 15px;" library="images" name="back_icon.png"/>
+				</p:commandLink>
+				<p:tooltip id="backtip" for="back" value="#{msgs.back}" trackMouse="true"/>
+				<p:commandLink id="app" class="button3" action="#{timesheetDriver.approveTimesheet}">
+					<h:graphicImage class="buttonlink3" style="background-color: #FFFFFF; margin: 15px 0 5px 15px;" library="images" name="check_icon.png"/>
+				</p:commandLink>
+				<p:tooltip id="apptip" for="app" value="#{msgs.approve}" trackMouse="true"/>
+				<p:commandLink id="rej" class="button3" action="#{timesheetDriver.returnTimesheet}">
+					<h:graphicImage class="buttonlink3" style="background-color: #FFFFFF; margin: 15px 0 5px 15px;" library="images" name="x_icon.png"/>
+				</p:commandLink>
+				<p:tooltip id="rejtip" for="rej" value="#{msgs.reject}" trackMouse="true"/>
+			</h:form>
+		</ui:define>
+	</ui:composition>

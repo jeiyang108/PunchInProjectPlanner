@@ -1,0 +1,88 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="/templates/managerTemplate.xhtml">
+	<ui:define name="navbar">
+		<div class="navbar">
+			<h:graphicImage class="logotext" library="images" name="logo_text.png"/>
+			<h:form>
+				<h:commandLink styleClass="navleft" action="/sections/employee/workPackages" value="#{msgs.navDashboard}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/employees" rendered="#{loginBean.currEmp.admin or loginBean.currEmp.basicInfo.credentials.role eq 'HR'}" value="#{msgs.employeeManagement}"/>
+				<h:commandLink styleClass="navleft" style="color: #76C2C1;" rendered="#{loginBean.isProjectManager()}" action="/sections/manager/projects?faces-redirect=true"  value="#{msgs.projects}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/reports" rendered="#{loginBean.currEmp.admin or loginBean.projectManager}" value="#{msgs.reports}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/timesheets"  rendered="#{loginBean.currEmp.timesheetApprover}" value="#{msgs.timesheets}"/>
+				<h:commandLink styleClass="navright" action="#{loginBean.logout}" value="#{msgs.navLogout}"/>
+			</h:form>
+		</div>
+	</ui:define>
+	<ui:define name="contentfull">
+		<h:form id="projects" style="margin:5px">
+			<div id="summarytitle" style="width: 98%; color: #76C2C1; margin: 10px; padding-bottom: 10px; border-bottom: 1px solid #5A6364;">
+				#{msgs.projectsTitle}
+			</div>
+			<div>
+				<p:dataTable headerClass="projectheader" footerClass="projectfooter"
+					value="#{projectDriver.projects}" editable="true" var="project"
+					widgetVar="projectTable" id="projectTable"
+					rows="8"
+                		paginator="true"
+                		paginatorPosition="bottom"
+                		paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                		oncomplete="projectTable.clearFilters();">
+					<p:column filterBy="#{project.projectName}" filterMatchMode="contains">
+						<f:facet name="header">#{msgs.name}</f:facet>
+						<div style="text-align: center">
+							<h:outputText value="#{project.projectName}" />
+						</div>
+					</p:column>
+					<p:column filterBy="#{project.projectManager.firstName} #{project.projectManager.lastName}" filterMatchMode="contains">
+						<f:facet name="header">#{msgs.projectManager}</f:facet>
+						<h:outputText value="#{project.projectManager.firstName} #{project.projectManager.lastName}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">#{msgs.projectStartDate}</f:facet>
+						<div style="text-align: center">
+							<h:outputText value="#{project.startDate}" >
+								<f:convertDateTime type="date" pattern="yyyy-MM-dd"/>
+							</h:outputText>
+						</div>
+					</p:column>
+					<p:column>
+						<f:facet name="header">#{msgs.projectEndDate}</f:facet>
+						<div style="text-align: center">
+							<h:outputText value="#{project.endDate}" >
+								<f:convertDateTime type="date" pattern="yyyy-MM-dd"/>
+							</h:outputText>
+						</div>
+					</p:column>
+					<p:column>
+						<f:facet name="header">#{msgs.labourSpent}</f:facet>
+						<div style="text-align: center">
+							TODO
+						</div>
+					</p:column>
+					<p:column>
+						<f:facet name="header">#{msgs.status}</f:facet>
+						<div class="projectliststatus #{uiDriver.getProjectStatusClass(project)}" style="margin: 0;">
+							<h:outputText value="#{project.status}"/>
+						</div>
+					</p:column>
+					<p:column style="width:80px;text-align: center">
+						<p:commandLink id="view" class="button3" action="#{projectDriver.viewProject(project)}">
+							<h:graphicImage class="buttonlink3" style="background-color: #F2997D; margin: 3px;" library="images" name="view_icon.png"/>
+						</p:commandLink>
+						<p:tooltip id="viewtip" for="view" value="#{msgs.view}" trackMouse="true"/>
+					</p:column>
+					<f:facet name="paginatorBottomRight">
+					</f:facet>
+				</p:dataTable>
+			</div>
+			<p:commandLink id="add" class="button3" update="projects" action="#{projectDriver.createProject()}">
+				<h:graphicImage class="buttonlink3" style="height: 18px; width: 18px; padding: 7px; margin-top:-35px ; margin-right: 0;" library="images" name="add_icon.png"/>
+			</p:commandLink>
+			<p:tooltip id="addtip" for="add" value="#{msgs.add}" trackMouse="true"/>
+		</h:form>
+	</ui:define>
+</ui:composition>

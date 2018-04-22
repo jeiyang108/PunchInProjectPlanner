@@ -1,0 +1,38 @@
+build/
+bin/
+target/
+libs/
+tmp/
+temp/
+node_modules/
+
+
+# OS Files #
+.DS_Store
+ 
+*.class
+ 
+# Package Files #
+*.jar
+*.war
+*.ear
+*.db
+rebel.xml
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.classpath
+*.jsfdia
+.settings/
+build/
+bin/
+target/
+libs/
+tmp/
+node_modules/
+/.metadata/
+
+# Exceptions #
+!WebContent/WEB-INF/lib/*.jar

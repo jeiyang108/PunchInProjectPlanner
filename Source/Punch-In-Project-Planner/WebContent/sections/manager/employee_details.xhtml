@@ -1,0 +1,127 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="/templates/managerTemplate.xhtml">
+	<ui:define name="navbar">
+		<div class="navbar">
+			<h:graphicImage class="logotext" library="images" name="logo_text.png"/>
+			<h:form>
+				<h:commandLink styleClass="navleft" action="/sections/employee/workPackages" value="#{msgs.navDashboard}"/>
+				<h:commandLink styleClass="navleft" rendered="#{loginBean.currEmp.admin or loginBean.currEmp.basicInfo.credentials.role eq 'HR'}" style="color: #76C2C1;" action="/sections/manager/employees" value="#{msgs.employeeManagement}"/>
+				<h:commandLink styleClass="navleft" rendered="#{loginBean.isProjectManager()}" action="/sections/manager/projects?faces-redirect=true" value="#{msgs.projects}"/>
+				<h:commandLink styleClass="navleft" rendered="#{loginBean.currEmp.admin or loginBean.projectManager}" action="/sections/manager/reports" value="#{msgs.reports}"/>
+				<h:commandLink styleClass="navleft" rendered="#{loginBean.currEmp.timesheetApprover}" action="/sections/manager/timesheets"   value="#{msgs.timesheets}"/>
+				<h:commandLink styleClass="navright" action="#{loginBean.logout}" value="#{msgs.navLogout}"/>
+			</h:form>
+		</div>
+	</ui:define>
+	<ui:define name="contentfull">
+		<h:form id="editEmployee">
+			<div id="summarytitle" style="width: 98%; color: #76C2C1; margin: 10px; padding-bottom: 10px; border-bottom: 1px solid #5A6364;">
+				<h:outputFormat value="#{msgs.employeeDetailsTitle}"/>
+			</div>
+			<p:panelGrid>
+				<p:row>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.id}</span>
+					</p:column>
+					<p:column>
+						#{hrManagementDriver.currEmp.basicInfo.employeeID}
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.userName}</span>
+					</p:column>
+					<p:column>
+						#{hrManagementDriver.currEmp.basicInfo.credentials.userName}
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.firstName}</span>
+					</p:column>
+					<p:column>
+						#{hrManagementDriver.currEmp.basicInfo.firstName}
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.lastName}</span>
+					</p:column>
+					<p:column>
+						#{hrManagementDriver.currEmp.basicInfo.lastName}
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.sickLeaves}</span>
+					</p:column>
+					<!--  -->
+					<p:column>
+						#{hrManagementDriver.currEmp.basicInfo.sickLeaves}
+					</p:column> 
+				</p:row>
+				<p:row>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.vacation}</span>
+					</p:column>
+					<p:column>
+					#{hrManagementDriver.currEmp.basicInfo.vacation}
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.flexTime}</span>
+					</p:column>
+					<p:column>
+					#{hrManagementDriver.currEmp.basicInfo.flexTime}
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.manager}</span>
+					</p:column>
+					<p:column>
+						#{hrManagementDriver.currEmp.basicInfo.supervisor.firstName} #{hrManagementDriver.currEmp.basicInfo.supervisor.lastName} 
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.timesheetApprover}</span>
+					</p:column>
+					<p:column>
+						#{hrManagementDriver.currEmp.basicInfo.timesheetApprover.firstName} #{hrManagementDriver.currEmp.basicInfo.timesheetApprover.lastName} 
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.active}</span>
+					</p:column>
+					<p:column>
+						<p:selectBooleanCheckbox value="#{hrManagementDriver.currEmp.basicInfo.active}" disabled="true"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.roles}</span>
+					</p:column>
+					<p:column>
+						#{hrManagementDriver.currEmp.basicInfo.credentials.role}
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+			<div style="margin: 10px; width: 98%; height: 1px; background-color: #586465"/>
+			<p:commandLink id="back" class="button3" action="employees">
+				<h:graphicImage class="buttonlink3" style="background-color: #76C2C1; margin-right: 0" library="images" name="back_icon.png"/>
+			</p:commandLink>
+			<p:tooltip id="backtip" for="back" value="#{msgs.back}" trackMouse="true"/>
+			<h:commandLink id="edit" class="button3" action="#{hrManagementDriver.editEmployee(hrManagementDriver.currEmp)}" >
+				<h:graphicImage class="buttonlink3" library="images" name="edit_icon.png"/>
+			</h:commandLink>
+			<p:tooltip id="edittip" for="edit" value="#{msgs.edit}" trackMouse="true"/>
+		</h:form>
+	</ui:define>
+</ui:composition>

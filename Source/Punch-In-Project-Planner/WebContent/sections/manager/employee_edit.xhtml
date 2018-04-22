@@ -1,0 +1,168 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="/templates/managerTemplate.xhtml">
+	<ui:define name="navbar">
+		<div class="navbar">
+			<h:graphicImage class="logotext" library="images" name="logo_text.png"/>
+			<h:form>
+				<h:commandLink styleClass="navleft" action="/sections/employee/workPackages" value="#{msgs.navDashboard}"/>
+				<h:commandLink styleClass="navleft" rendered="#{loginBean.currEmp.admin or loginBean.currEmp.basicInfo.credentials.role eq 'HR'}" style="color: #76C2C1;" action="/sections/manager/employees" value="#{msgs.employeeManagement}"/>
+				<h:commandLink styleClass="navleft" rendered="#{loginBean.isProjectManager()}" action="/sections/manager/projects?faces-redirect=true" value="#{msgs.projects}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/reports" rendered="#{loginBean.currEmp.admin or loginBean.projectManager}" value="#{msgs.reports}"/>
+				<h:commandLink styleClass="navleft" action="/sections/manager/timesheets"  rendered="#{loginBean.currEmp.timesheetApprover}" value="#{msgs.timesheets}"/>
+				<h:commandLink styleClass="navright" action="#{loginBean.logout}" value="#{msgs.navLogout}"/>
+			</h:form>
+		</div>
+	</ui:define>
+	<ui:define name="contentfull">
+		<h:form id="editEmployee">
+		<div id="summarytitle" style="width: 98%; color: #76C2C1; margin: 10px; padding-bottom: 10px; border-bottom: 1px solid #5A6364;">
+			<h:outputFormat value="#{msgs.employeeEditTitle}"/>
+		</div>
+		<div>
+			<p:panelGrid>
+				<p:row>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.id}</span>
+					</p:column>
+					<p:column>
+						<p:inputText style="width: 98.5%" value="#{hrManagementDriver.currEmp.basicInfo.employeeID}">
+							<f:validator validatorId="MinVal" />
+								<f:attribute name="msg" value="#{msgs.employeeIdErrorMin}" />
+								<f:attribute name="lowerBound" value="1" />
+								<f:attribute name="upperBound" value="max" />	
+						</p:inputText>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.userName}</span>
+					</p:column>
+					<p:column>
+						<p:inputText style="width: 98.5%" value="#{hrManagementDriver.newUserName}">
+							<f:validator validatorId="NotNull"/>
+								<f:attribute name="msg" value="#{msgs.employeeUserNameError}" />
+						</p:inputText>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.passHint}</span>
+					</p:column>
+					<p:column>
+						<p:password style="width: 98.5%" value="#{hrManagementDriver.newPassword}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.firstName}</span>
+					</p:column>
+					<p:column>
+						<p:inputText style="width: 98.5%" value="#{hrManagementDriver.currEmp.basicInfo.firstName}">
+							<f:validator validatorId="NotNull"/>
+								<f:attribute name="msg" value="#{msgs.employeeFirstNameError}" />
+						</p:inputText>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.lastName}</span>
+					</p:column>
+					<p:column>
+						<p:inputText style="width: 98.5%" value="#{hrManagementDriver.currEmp.basicInfo.lastName}">
+							<f:validator validatorId="NotNull"/>
+								<f:attribute name="msg" value="#{msgs.employeeLastNameError}" />
+						</p:inputText>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.sickLeaves}</span>
+					</p:column>
+					<p:column>
+						<p:inputText style="width: 98.5%" value="#{hrManagementDriver.currEmp.basicInfo.sickLeaves}"></p:inputText>
+					</p:column> 
+				</p:row>
+				<p:row>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.vacation}</span>
+					</p:column>
+					<p:column>
+						<p:inputText style="width: 98.5%" value="#{hrManagementDriver.currEmp.basicInfo.vacation}"></p:inputText>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.flexTime}</span>
+					</p:column>
+					<p:column>
+						<p:inputText style="width: 98.5%" value="#{hrManagementDriver.currEmp.basicInfo.flexTime}"></p:inputText>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.manager}</span>
+					</p:column>
+					<p:column>
+						<h:selectOneMenu id="empManagerSelector" styleClass="modal" style="width: 100%" value="#{hrManagementDriver.currEmp.basicInfo.supervisor}" converter="#{employeeManagerSelector}">
+							<f:selectItems value="#{hrManagementDriver.employeeEntities}" var="empMan" itemLabel="#{empMan.firstName} #{empMan.lastName}" itemValue="#{empMan}" />
+						</h:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.timesheetApprover}</span>
+					</p:column>
+					<p:column>
+						<h:selectOneMenu id="empTimesheetSelector" styleClass="modal" style="width: 100%" value="#{hrManagementDriver.currEmp.basicInfo.timesheetApprover}" converter="#{employeeManagerSelector}">
+							<f:selectItems value="#{hrManagementDriver.employeeEntities}" var="emp" itemLabel="#{emp.firstName} #{emp.lastName}" itemValue="#{emp}" />
+						</h:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.roles}</span>
+					</p:column>
+					<p:column>
+						<h:selectOneMenu rendered="#{loginBean.currEmp.basicInfo.credentials.role eq 'admin'}" id="empRoleSelectorAdmin" styleClass="modal" style="width: 100%" value="#{hrManagementDriver.currEmp.basicInfo.credentials.role}" >
+							<f:selectItem itemValue="Employee" itemLabel="#{msgs.employee}"/>
+							<f:selectItem itemValue="HR" itemLabel="#{msgs.hr}"/>
+							<f:selectItem itemValue="admin" itemLabel="#{msgs.admin}" />
+						</h:selectOneMenu>
+						<!--  -->
+						<h:selectOneMenu disabled="#{hrManagementDriver.currEmp.basicInfo.credentials.role eq 'admin'}" rendered="#{loginBean.currEmp.basicInfo.credentials.role ne 'admin'}" id="empRoleSelectorHR" styleClass="modal" style="width: 100%" value="#{hrManagementDriver.currEmp.basicInfo.credentials.role}" >
+							<f:selectItem itemValue="Employee" itemLabel="#{msgs.employee}"/>
+							<f:selectItem itemValue="HR" itemLabel="#{msgs.hr}"/>
+						</h:selectOneMenu>
+					</p:column>
+				</p:row>
+				
+				<p:row>
+					<p:column>
+						<span style="font-weight: bold;">#{msgs.active}</span>
+					</p:column>
+					<p:column>
+						<p:selectBooleanCheckbox style="background-color: #F7F8F8; border: #F7F8F8 3px solid; border-radius: 100%; height: 17px; width: 17px;" value="#{hrManagementDriver.currEmp.basicInfo.active}"/>
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+			</div>
+			<div style="margin: 10px; width: 98%; height: 1px; background-color: #586465"/>
+			<p:commandLink id="save" class="button3" action="#{hrManagementDriver.submitEmployee(hrManagementDriver.currEmp)}" update="@form">
+				<h:graphicImage class="buttonlink3" style="background-color: #F2997D; margin-right: 0;" library="images" name="save_icon.png"/>
+			</p:commandLink>
+			<p:tooltip id="savetip" for="save" value="#{msgs.save}" trackMouse="true"/>
+			<p:commandLink id="cancel" class="button3" action="employees">
+				<h:graphicImage class="buttonlink3" style="background-color: #76C2C1;" library="images" name="delete_icon.png"/>
+			</p:commandLink>
+			<p:tooltip id="canceltip" for="cancel" value="#{msgs.cancel}" trackMouse="true"/>
+			<p:dialog id="msgDialog" widgetVar="messageDialog" modal="true" appendToBody="true" header="Errors"
+        			visible="#{facesContext.validationFailed}" position="center center">
+        			<p:messages id="messagesInDialog" />
+    			</p:dialog>
+		</h:form>
+	</ui:define>
+</ui:composition>
